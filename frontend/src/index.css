@@ -22,6 +22,7 @@
   --color-on-surface: #251913;
   --color-primary: #9d4300;
   --color-on-secondary: #ffffff;
+  --color-brand-teal: #0D9488;
   --color-error-container: #ffdad6;
   --color-on-tertiary-fixed-variant: #004b74;
   --color-surface-container-lowest: #ffffff;
@@ -48,6 +49,11 @@
   --color-on-tertiary-fixed: #001d32;
   --color-inverse-on-surface: #ffede6;
   --color-inverse-primary: #ffb690;
+  --color-tripzy-bg: #FFFBF5;
+  --color-tripzy-orange: #F97316;
+  --color-tripzy-orange-dark: #C2410C;
+  --color-tripzy-teal: #0D9488;
+  --color-tripzy-text: #292524;
 
   --spacing-container-max: 1280px;
   --spacing-base: 8px;
@@ -55,9 +61,9 @@
   --spacing-margin-mobile: 16px;
   --spacing-gutter: 24px;
 
-  --font-body-lg: Inter, sans-serif;
-  --font-label-sm: Inter, sans-serif;
-  --font-body-md: Inter, sans-serif;
+  --font-body-lg: "Plus Jakarta Sans", sans-serif;
+  --font-label-sm: "Plus Jakarta Sans", sans-serif;
+  --font-body-md: "Plus Jakarta Sans", sans-serif;
   --font-headline-md: Montserrat, sans-serif;
   --font-display-lg: Montserrat, sans-serif;
   --font-display-lg-mobile: Montserrat, sans-serif;
@@ -118,5 +124,71 @@
     .step-line::after {
       display: none;
     }
+  }
+
+  /* Custom SaaS Redesign Utilities */
+  .glass-panel {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(41, 37, 36, 0.08);
+    box-shadow: 0px 8px 32px rgba(41, 37, 36, 0.04), 0px 24px 64px rgba(41, 37, 36, 0.04);
+  }
+
+  .glow-shadow {
+    box-shadow: 0px 8px 24px rgba(249, 115, 22, 0.25);
+  }
+
+  .focus-ring-glow:focus-within {
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    border-color: #F97316;
+  }
+
+  .floating-input:focus ~ label,
+  .floating-input:not(:placeholder-shown) ~ label {
+    transform: translateY(-80%) scale(0.85);
+    color: #F97316;
+    opacity: 0.8;
+  }
+
+  @keyframes blob-morph {
+    0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.05); }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1); }
+  }
+
+  .animate-blob-morph {
+    animation: blob-morph 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes fade-up {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Neo-Brutalism Vibrant Variant Utilities */
+  .staggered-shadow {
+    box-shadow: 12px 12px 0px 0px rgba(13, 148, 136, 0.2);
+  }
+
+  .staggered-shadow-orange {
+    box-shadow: -12px 12px 0px 0px rgba(249, 115, 22, 0.2);
+  }
+
+  .bouncy-hover:hover {
+    transform: scale(1.02) rotate(-1deg);
+  }
+
+  .bouncy-hover-alt:hover {
+    transform: scale(1.02) rotate(1deg);
+  }
+
+  .bg-pattern {
+    background-image: radial-gradient(#f97316 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    opacity: 0.1;
   }
 }
