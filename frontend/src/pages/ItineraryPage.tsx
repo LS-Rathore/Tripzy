@@ -170,11 +170,10 @@ export default function ItineraryPage() {
                 <button
                   key={idx}
                   onClick={() => setSelections((prev) => ({ ...prev, [`${activeDay}-${slotKey}`]: idx }))}
-                  className={`w-8 h-8 rounded-lg border-2 border-black font-black text-xs transition-all ${
-                    selectedIdx === idx
+                  className={`w-8 h-8 rounded-lg border-2 border-black font-black text-xs transition-all ${selectedIdx === idx
                       ? 'bg-tripzy-orange text-white shadow-[2px_2px_0px_0px_#000]'
                       : 'bg-white text-on-surface hover:bg-tripzy-orange/10'
-                  }`}
+                    }`}
                 >
                   {idx + 1}
                 </button>
@@ -210,7 +209,7 @@ export default function ItineraryPage() {
   return (
     <div className="min-h-screen bg-tripzy-bg text-on-surface font-body-md flex flex-col relative overflow-x-hidden">
       <div className="fixed inset-0 bg-pattern -z-10"></div>
-      
+
       <Navbar />
 
       <main className="flex-grow w-full max-w-5xl mx-auto px-6 py-12 space-y-10 animate-fade-up">
@@ -306,11 +305,10 @@ export default function ItineraryPage() {
                   setActiveDay(d.day);
                   setActivePlanType('Primary'); // Reset plan label on day change
                 }}
-                className={`px-5 py-2.5 rounded-xl border-[3px] border-black font-black text-sm transition-all bouncy-hover ${
-                  activeDay === d.day
+                className={`px-5 py-2.5 rounded-xl border-[3px] border-black font-black text-sm transition-all bouncy-hover ${activeDay === d.day
                     ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]'
                     : 'bg-white text-on-surface shadow-[4px_4px_0px_0px_#251913] hover:bg-tripzy-orange/10'
-                }`}
+                  }`}
               >
                 Day {d.day}
               </button>
@@ -322,22 +320,20 @@ export default function ItineraryPage() {
             <div className="flex flex-wrap gap-3 justify-center pt-2">
               <button
                 onClick={() => setActivePlanType('Primary')}
-                className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${
-                  activePlanType === 'Primary'
+                className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${activePlanType === 'Primary'
                     ? 'bg-brand-teal text-white shadow-[2px_2px_0px_0px_#000]'
                     : 'bg-white text-on-surface hover:bg-brand-teal/10'
-                }`}
+                  }`}
               >
                 📍 Primary Route Plan
               </button>
               {altPlan1 && (
                 <button
                   onClick={() => setActivePlanType('Alt1')}
-                  className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${
-                    activePlanType === 'Alt1'
+                  className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${activePlanType === 'Alt1'
                       ? 'bg-tripzy-orange text-white shadow-[2px_2px_0px_0px_#000]'
                       : 'bg-white text-on-surface hover:bg-tripzy-orange/10'
-                  }`}
+                    }`}
                 >
                   🎭 {altPlan1.label.replace('Alternative: ', '')}
                 </button>
@@ -345,11 +341,10 @@ export default function ItineraryPage() {
               {altPlan2 && (
                 <button
                   onClick={() => setActivePlanType('Alt2')}
-                  className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${
-                    activePlanType === 'Alt2'
+                  className={`px-4 py-2 rounded-xl border-2 border-black font-black text-xs transition-all ${activePlanType === 'Alt2'
                       ? 'bg-tripzy-orange text-white shadow-[2px_2px_0px_0px_#000]'
                       : 'bg-white text-on-surface hover:bg-tripzy-orange/10'
-                  }`}
+                    }`}
                 >
                   🏔️ {altPlan2.label.replace('Alternative: ', '')}
                 </button>
@@ -361,7 +356,7 @@ export default function ItineraryPage() {
         {/* active plan view */}
         {activePlanType === 'Primary' && primaryPlan ? (
           <div className="space-y-8 animate-fade-up">
-            
+
             {/* Header info for daily cost */}
             <div className="flex justify-between items-center bg-white p-4 rounded-xl border-[3px] border-black">
               <span className="font-extrabold text-sm text-on-surface-variant">Selected options daily cost:</span>
@@ -372,7 +367,7 @@ export default function ItineraryPage() {
 
             {/* Timeline details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* Left Column: Morning & Afternoon & Evening Activities */}
               <div className="space-y-6">
                 <h3 className="font-display-lg font-black text-xl text-brand-teal border-b-2 border-brand-teal pb-1">

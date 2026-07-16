@@ -1,7 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Groq } from 'groq-sdk';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const groq = new Groq({ apiKey: GROQ_API_KEY });
 
 interface TripItineraryDetails {
   city: string;
@@ -167,37 +171,63 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fence
 }
 
 export async function generateTripItinerary(details: TripItineraryDetails): Promise<ItineraryResponse> {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    console.warn('Gemini API key is not set. Falling back to mock itinerary.');
-    return getMockItinerary(details);
-  }
+  const prompt = buildItineraryPrompt(details);
 
-  try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      generationConfig: {
-        temperature: 0.5,
-        maxOutputTokens: 8192,
-        responseMimeType: 'application/json',
-      },
-    });
+  // 1. Try Gemini
+  if (GEMINI_API_KEY && GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE') {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        generationConfig: {
+          temperature: 0.5,
+          maxOutputTokens: 8192,
+          responseMimeType: 'application/json',
+        },
+      });
 
-    const prompt = buildItineraryPrompt(details);
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const parsed: ItineraryResponse = JSON.parse(text);
 
-    const parsed: ItineraryResponse = JSON.parse(text);
+      if (!parsed.days || !Array.isArray(parsed.days) || parsed.days.length === 0) {
+        throw new Error('Invalid day structure returned from Gemini');
+      }
 
-    // Validate structure basics
-    if (!parsed.days || !Array.isArray(parsed.days) || parsed.days.length === 0) {
-      throw new Error('Invalid day structure returned from AI');
+      console.log('Successfully generated itinerary using Gemini.');
+      return parsed;
+    } catch (error: any) {
+      console.warn('Gemini AI itinerary generation failed, falling back to Groq...', error.message || error);
     }
-
-    return parsed;
-  } catch (error: any) {
-    console.error('Gemini AI itinerary generation failed, falling back to mock itinerary. Error:', error.message || error);
-    return getMockItinerary(details);
   }
+
+  // 2. Try Groq
+  if (GROQ_API_KEY && GROQ_API_KEY !== 'gsk_your_api_key_here') {
+    try {
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.5,
+        max_tokens: 8192,
+        response_format: { type: 'json_object' }
+      });
+
+      const text = chatCompletion.choices[0]?.message?.content || "";
+      const parsed: ItineraryResponse = JSON.parse(text);
+
+      if (!parsed.days || !Array.isArray(parsed.days) || parsed.days.length === 0) {
+        throw new Error('Invalid day structure returned from Groq');
+      }
+
+      console.log('Successfully generated itinerary using Groq.');
+      return parsed;
+    } catch (error: any) {
+      console.warn('Groq AI itinerary generation failed, falling back to Mock...', error.message || error);
+    }
+  }
+
+  // 3. Fallback to Mock
+  console.warn('All AI providers failed or keys missing. Falling back to mock itinerary.');
+  return getMockItinerary(details);
 }
 
 function getMockItinerary(details: TripItineraryDetails): ItineraryResponse {

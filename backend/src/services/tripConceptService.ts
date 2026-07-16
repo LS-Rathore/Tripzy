@@ -1,8 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Groq } from 'groq-sdk';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const groq = new Groq({ apiKey: GROQ_API_KEY });
 
 interface TripDetails {
   city: string;
@@ -96,37 +99,63 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fence
 }
 
 export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsResponse> {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    console.warn('Gemini API key is not set. Falling back to mock concepts.');
-    return getMockConcepts(trip);
-  }
+  const prompt = buildPrompt(trip);
 
-  try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048,
-        responseMimeType: 'application/json',
-      },
-    });
+  // 1. Try Gemini
+  if (GEMINI_API_KEY && GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE') {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048,
+          responseMimeType: 'application/json',
+        },
+      });
 
-    const prompt = buildPrompt(trip);
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const parsed: ConceptsResponse = JSON.parse(text);
 
-    const parsed: ConceptsResponse = JSON.parse(text);
+      if (!parsed.concepts || !Array.isArray(parsed.concepts) || parsed.concepts.length !== 3) {
+        throw new Error('Invalid response structure from Gemini');
+      }
 
-    // Validate structure
-    if (!parsed.concepts || !Array.isArray(parsed.concepts) || parsed.concepts.length !== 3) {
-      throw new Error('Invalid response structure from AI');
+      console.log('Successfully generated concepts using Gemini.');
+      return parsed;
+    } catch (error: any) {
+      console.warn('Gemini AI generation failed, falling back to Groq...', error.message || error);
     }
-
-    return parsed;
-  } catch (error: any) {
-    console.error('Gemini AI generation failed, falling back to mock concepts. Error:', error.message || error);
-    return getMockConcepts(trip);
   }
+
+  // 2. Try Groq
+  if (GROQ_API_KEY && GROQ_API_KEY !== 'gsk_your_api_key_here') {
+    try {
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 2048,
+        response_format: { type: 'json_object' }
+      });
+
+      const text = chatCompletion.choices[0]?.message?.content || "";
+      const parsed: ConceptsResponse = JSON.parse(text);
+
+      if (!parsed.concepts || !Array.isArray(parsed.concepts) || parsed.concepts.length !== 3) {
+        throw new Error('Invalid response structure from Groq');
+      }
+
+      console.log('Successfully generated concepts using Groq.');
+      return parsed;
+    } catch (error: any) {
+      console.warn('Groq AI generation failed, falling back to Mock...', error.message || error);
+    }
+  }
+
+  // 3. Fallback to Mock
+  console.warn('All AI providers failed or keys missing. Falling back to mock concepts.');
+  return getMockConcepts(trip);
 }
 
 function getMockConcepts(trip: TripDetails): ConceptsResponse {

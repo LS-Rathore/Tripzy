@@ -105,6 +105,34 @@ router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/trips — Retrieve all trips for the authenticated user
+router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'User not identified' });
+      return;
+    }
+
+    const trips = await prisma.trip.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        city: true,
+        numberOfDays: true,
+        conceptName: true,
+        createdAt: true,
+      },
+    });
+
+    res.json(trips);
+  } catch (error) {
+    console.error('Fetch trips error:', error);
+    res.status(500).json({ error: 'Failed to fetch trips' });
+  }
+});
+
 // GET /api/trips/:id — Retrieve a trip by ID (requires authentication)
 router.get('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
