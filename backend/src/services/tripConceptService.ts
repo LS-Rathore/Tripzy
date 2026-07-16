@@ -96,24 +96,25 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fence
 }
 
 export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsResponse> {
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not configured');
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+    console.warn('Gemini API key is not set. Falling back to mock concepts.');
+    return getMockConcepts(trip);
   }
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 2048,
-      responseMimeType: 'application/json',
-    },
-  });
-
-  const prompt = buildPrompt(trip);
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
-
   try {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const prompt = buildPrompt(trip);
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
     const parsed: ConceptsResponse = JSON.parse(text);
 
     // Validate structure
@@ -122,8 +123,64 @@ export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsR
     }
 
     return parsed;
-  } catch (parseError) {
-    console.error('Failed to parse AI response:', text);
-    throw new Error('Failed to parse trip concepts from AI response');
+  } catch (error: any) {
+    console.error('Gemini AI generation failed, falling back to mock concepts. Error:', error.message || error);
+    return getMockConcepts(trip);
   }
+}
+
+function getMockConcepts(trip: TripDetails): ConceptsResponse {
+  const totalBudget = trip.budgetPerDay * trip.numberOfDays;
+  const styleStr = trip.travelStyle.toLowerCase();
+
+  const est1 = Math.round(totalBudget * 0.7);
+  const est2 = Math.round(totalBudget * 0.95);
+  const est3 = Math.round(totalBudget * 1.2);
+
+  return {
+    concepts: [
+      {
+        id: 'relaxed-explorer',
+        name: 'Relaxed Explorer',
+        vibeDescription: `A laid-back exploration of ${trip.city} tailored for a ${trip.travelerType.toLowerCase()} trip. Fewer stops, longer lunches, and plenty of time to absorb the local atmosphere without rushing.`,
+        estimatedTotalCost: est1,
+        budgetFit: est1 <= totalBudget ? 'below' : 'exceeds',
+        highlights: [
+          `Lazy mornings exploring historical alleys`,
+          `Traditional local lunches at heritage spots`,
+          `Scenic sunsets with local tea/snacks`,
+          `Handicraft market strolls`
+        ],
+        bestFor: 'Best if you prefer waking up late and enjoying quiet, unhurried spots.'
+      },
+      {
+        id: 'balanced-highlights',
+        name: 'Balanced Highlights',
+        vibeDescription: `The perfect mix of must-see landmarks and local secrets. Experience the classic sights of ${trip.city} combined with authentic food stops and hidden neighborhoods.`,
+        estimatedTotalCost: est2,
+        budgetFit: est2 <= totalBudget ? 'within' : 'exceeds',
+        highlights: [
+          `Top-rated iconic monuments & photo ops`,
+          `Authentic street food tastings`,
+          `Guided cultural walk through old markets`,
+          `Sunset panoramic city views`
+        ],
+        bestFor: 'Best for first-time visitors who want a complete overview without feeling exhausted.'
+      },
+      {
+        id: 'packed-adventurer',
+        name: 'Packed Adventurer',
+        vibeDescription: `A high-intensity, action-packed plan to cover absolutely everything in ${trip.city} over ${trip.numberOfDays} days. Early mornings, active transport, and maximum sightseeing.`,
+        estimatedTotalCost: est3,
+        budgetFit: est3 <= totalBudget ? 'within' : 'exceeds',
+        highlights: [
+          `Sunrise fort/hill climb for the early light`,
+          `Back-to-back monument marathon tours`,
+          `Traditional dinner with a local dance performance`,
+          `Late-night food bazaar exploration`
+        ],
+        bestFor: 'Best for energetic travelers who want to see every single spot on the map.'
+      }
+    ]
+  };
 }

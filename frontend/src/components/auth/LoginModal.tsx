@@ -42,25 +42,25 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       />
       
       {/* Modal Content */}
-      <div className="bg-white/95 backdrop-blur-md w-full max-w-md p-8 md:p-10 border-[3px] border-[#251913] rounded-[24px] shadow-[0px_12px_32px_rgba(41,37,36,0.12)] relative z-10 animate-fade-up">
+      <div className="bg-white/95 backdrop-blur-md w-full max-w-sm p-6 md:p-8 border-[3px] border-[#251913] rounded-[24px] shadow-[0px_12px_32px_rgba(41,37,36,0.12)] relative z-10 animate-fade-up">
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-on-surface-variant hover:text-tripzy-orange transition-colors p-2 rounded-full hover:bg-surface-variant/30"
+          className="absolute top-4 right-4 text-on-surface-variant hover:text-tripzy-orange transition-colors p-1.5 rounded-full hover:bg-surface-variant/30 z-20"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
 
-        {/* Decorative Floating Icon (hidden on small screens, maybe keep it inside or attached to border) */}
-        <div className="absolute -top-6 -right-6 w-16 h-16 bg-tripzy-orange text-white rounded-2xl flex items-center justify-center rotate-12 shadow-[0px_8px_16px_rgba(249,115,22,0.3)] hidden md:flex border-[3px] border-[#251913]">
-          <span className="material-symbols-outlined text-3xl font-bold">flight_takeoff</span>
+        {/* Decorative Floating Icon (placed on the top-left corner) */}
+        <div className="absolute -top-6 -left-6 w-14 h-14 bg-tripzy-orange text-white rounded-2xl flex items-center justify-center -rotate-12 shadow-[4px_4px_0px_0px_#251913] border-[3px] border-[#251913] z-20">
+          <span className="material-symbols-outlined text-2xl font-bold">flight_takeoff</span>
         </div>
 
-        <div className="text-center mb-8">
-          <h3 className="text-2xl font-black text-on-surface mb-2 font-display-lg">
+        <div className="text-center mb-6 pt-2">
+          <h3 className="text-xl font-black text-on-surface mb-1 font-display-lg">
             Sign In
           </h3>
-          <p className="font-body-md text-on-surface-variant font-medium">
+          <p className="font-body-md text-xs text-on-surface-variant font-semibold">
             Plan, save, and manage your trips.
           </p>
         </div>

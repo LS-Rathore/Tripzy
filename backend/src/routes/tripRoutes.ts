@@ -41,7 +41,7 @@ router.post('/concepts', async (req: Request, res: Response) => {
     });
 
     res.json(concepts);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Trip concepts generation error:', error);
 
     if (error instanceof Error && error.message === 'GEMINI_API_KEY is not configured') {
@@ -49,7 +49,7 @@ router.post('/concepts', async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(500).json({ error: 'Failed to generate trip concepts. Please try again.' });
+    res.status(500).json({ error: error.message || 'Failed to generate trip concepts. Please try again.' });
   }
 });
 
@@ -99,9 +99,9 @@ router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
     });
 
     res.json({ success: true, tripId: trip.id });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Save trip error:', error);
-    res.status(500).json({ error: 'Failed to save trip' });
+    res.status(500).json({ error: error.message || 'Failed to save trip' });
   }
 });
 

@@ -37,6 +37,7 @@ model Trip {
   days              Day[]
   conceptName       String?
   conceptVibe       String?
+  startingFrom      String?
   rawItinerary      Json?
   createdAt         DateTime @default(now())
 }
