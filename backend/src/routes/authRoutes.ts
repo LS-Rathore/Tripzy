@@ -1,11 +1,10 @@
 import { Router, type Request, type Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../config/db.js';
 import { requireAuth, type AuthRequest } from '../middleware/authMiddleware.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';

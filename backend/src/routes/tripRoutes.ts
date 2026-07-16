@@ -1,11 +1,10 @@
 import { Router, type Request, type Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../config/db.js';
 import { generateTripConcepts } from '../services/tripConceptService.js';
 import { generateTripItinerary } from '../services/tripItineraryService.js';
 import { requireAuth, type AuthRequest } from '../middleware/authMiddleware.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // POST /api/trips/concepts — Generate 3 trip concepts from form data
 router.post('/concepts', async (req: Request, res: Response) => {
