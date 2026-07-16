@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
 
   // Close on Escape key
   useEffect(() => {
@@ -114,7 +116,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </div>
 
         {/* Social Action */}
-        <button className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-[3px] border-outline-variant/60 rounded-xl hover:bg-tripzy-bg hover:border-[#251913] active:scale-[0.98] transition-all duration-200 group">
+        <button 
+          onClick={login}
+          className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-[3px] border-outline-variant/60 rounded-xl hover:bg-tripzy-bg hover:border-[#251913] active:scale-[0.98] transition-all duration-200 group"
+        >
           <img alt="Google Logo" height="20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYVF16dkw_IJYiOZqL0PC6szUxEyq3UZvTwDcvFOcGrr9XvgjJBcS1mXBRzBvuVDh-5JTdcAhBSqnPAInqKJvbt5E5ZeOOaeL3nQRp5e1FDjxTooMMhVX6J7Y-2UujP1dH1G0R_MyKXJIiPvMM9mrcpL5orbDl8zU0DAuAt2MHFlkfNXo0RGn4s9ot4CymGsvyur_AIzQbQRGfgo9-g-vpQSdL4bF_pmRTpvzl77nivXwAWhN43OoUGQ" width="20"/>
           <span className="font-label-sm font-bold text-on-surface group-hover:text-tripzy-orange transition-colors">Sign in with Google</span>
         </button>
