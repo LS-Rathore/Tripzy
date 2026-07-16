@@ -76,27 +76,27 @@ export default function Footer() {
 
         {/* Trust Column */}
         <div className="flex flex-col gap-4">
-          <h5 className="font-bold text-on-surface text-lg">Trust</h5>
+          <h5 className="font-bold text-on-surface text-lg">Company</h5>
           <ul className="flex flex-col gap-3">
             <li>
-              <a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">
-                Safety
-              </a>
+              <Link className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" to="/about">
+                About Us
+              </Link>
             </li>
             <li>
-              <a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">
+              <Link className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" to="/support">
                 Support
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">
+              <Link className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" to="/terms">
                 Terms
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">
+              <Link className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" to="/privacy">
                 Privacy Policy
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

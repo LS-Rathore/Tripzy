@@ -8,6 +8,10 @@ import MyTripsPage from './pages/MyTripsPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import FeaturesPage from './pages/FeaturesPage';
 import ExplorePage from './pages/ExplorePage';
+import AboutUsPage from './pages/AboutUsPage';
+import SupportPage from './pages/SupportPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import NotFoundPage from './pages/NotFoundPage';
 import './App.css';
 
@@ -21,6 +25,10 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/support" element={<SupportPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
           {/* Protected (require auth) */}
           <Route element={<ProtectedRoute />}>
