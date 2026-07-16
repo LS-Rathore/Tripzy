@@ -1,7 +1,11 @@
 import { Router, type Request, type Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 import { generateTripConcepts } from '../services/tripConceptService.js';
+import { generateTripItinerary } from '../services/tripItineraryService.js';
+import { requireAuth, type AuthRequest } from '../middleware/authMiddleware.js';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // POST /api/trips/concepts — Generate 3 trip concepts from form data
 router.post('/concepts', async (req: Request, res: Response) => {
@@ -47,6 +51,93 @@ router.post('/concepts', async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ error: 'Failed to generate trip concepts. Please try again.' });
+  }
+});
+
+// POST /api/trips — Save a trip with chosen concept (requires authentication)
+router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'User not identified' });
+      return;
+    }
+
+    const { city, startingFrom, numberOfDays, budgetPerDay, travelStyle, interests, travelerType, conceptName, conceptVibe } = req.body;
+
+    if (!city || !numberOfDays || !budgetPerDay || !travelStyle || !interests || !travelerType || !conceptName) {
+      res.status(400).json({ error: 'Missing required fields for saving trip' });
+      return;
+    }
+
+    // Generate the full detailed itinerary
+    const rawItinerary = await generateTripItinerary({
+      city,
+      startingFrom: startingFrom || undefined,
+      numberOfDays: Number(numberOfDays),
+      budgetPerDay: Number(budgetPerDay),
+      travelStyle,
+      interests: Array.isArray(interests) ? interests : [interests],
+      travelerType,
+      conceptName,
+      conceptVibe: conceptVibe || '',
+    });
+
+    const trip = await prisma.trip.create({
+      data: {
+        userId,
+        city,
+        startingFrom: startingFrom || null,
+        numberOfDays: Number(numberOfDays),
+        budgetPerDay: Number(budgetPerDay),
+        travelStyle,
+        interests: Array.isArray(interests) ? interests : [interests],
+        travelerType,
+        conceptName,
+        conceptVibe: conceptVibe || null,
+        rawItinerary: rawItinerary as any,
+      },
+    });
+
+    res.json({ success: true, tripId: trip.id });
+  } catch (error) {
+    console.error('Save trip error:', error);
+    res.status(500).json({ error: 'Failed to save trip' });
+  }
+});
+
+// GET /api/trips/:id — Retrieve a trip by ID (requires authentication)
+router.get('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const tripId = req.params.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not identified' });
+      return;
+    }
+
+    if (typeof tripId !== 'string') {
+      res.status(400).json({ error: 'Invalid trip ID' });
+      return;
+    }
+
+    const trip = await prisma.trip.findFirst({
+      where: {
+        id: tripId,
+        userId, // ensure users can only access their own trips
+      },
+    });
+
+    if (!trip) {
+      res.status(404).json({ error: 'Trip not found' });
+      return;
+    }
+
+    res.json(trip);
+  } catch (error) {
+    console.error('Fetch trip error:', error);
+    res.status(500).json({ error: 'Failed to fetch trip details' });
   }
 });
 

@@ -34,6 +34,9 @@ model Trip {
   packingList       Json?
   refined           Boolean  @default(false)
   days              Day[]
+  conceptName       String?
+  conceptVibe       String?
+  rawItinerary      Json?
   createdAt         DateTime @default(now())
 }
 

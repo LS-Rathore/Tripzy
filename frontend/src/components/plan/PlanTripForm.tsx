@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { TripFormData } from '../../types/TripForm';
+import type { TripConcept } from '../../types/Trip';
 
 const INTEREST_OPTIONS = [
   "Foodie",
@@ -18,19 +18,19 @@ const INTEREST_OPTIONS = [
 ];
 
 const LOADING_MESSAGES = [
-  "Asking a local friend for the best spots...",
-  "Finding hidden gems...",
-  "Planning the perfect route...",
-  "Discovering amazing local food...",
-  "Building your personalized itinerary..."
+  "Dreaming up your destination outline...",
+  "Consulting the local chai stalls...",
+  "Drafting three distinct travel paces...",
+  "Curating authentic offbeat highlights...",
+  "Vibe-checking your travel budget..."
 ];
 
 export interface PlanTripFormProps {
   onTopHalfComplete?: (isComplete: boolean) => void;
+  onConceptsLoaded: (concepts: TripConcept[], formData: TripFormData) => void;
 }
 
-export default function PlanTripForm({ onTopHalfComplete }: PlanTripFormProps) {
-  const navigate = useNavigate();
+export default function PlanTripForm({ onTopHalfComplete, onConceptsLoaded }: PlanTripFormProps) {
   const [loading, setLoading] = useState(false);
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,6 +44,8 @@ export default function PlanTripForm({ onTopHalfComplete }: PlanTripFormProps) {
     travelerType: 'Solo',
     startingFrom: ''
   });
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -77,16 +79,43 @@ export default function PlanTripForm({ onTopHalfComplete }: PlanTripFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setLoading(true);
-    // Simulate network delay
-    setTimeout(() => {
+    setErrors({});
+    
+    try {
+      const res = await fetch(`${API_URL}/api/trips/concepts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          city: formData.city,
+          startingFrom: formData.startingFrom || undefined,
+          numberOfDays: formData.numberOfDays,
+          budgetPerDay: formData.budgetPerDay,
+          travelStyle: formData.travelStyle,
+          interests: formData.interests,
+          travelerType: formData.travelerType,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to generate concepts');
+      }
+
+      const data = await res.json();
+      onConceptsLoaded(data.concepts, formData);
+    } catch (err: any) {
+      console.error(err);
+      setErrors({ submit: err.message || 'Something went wrong. Please try again.' });
+    } finally {
       setLoading(false);
-      navigate('/itinerary');
-    }, 12500);
+    }
   };
 
   const toggleInterest = (interest: string) => {
@@ -272,6 +301,12 @@ export default function PlanTripForm({ onTopHalfComplete }: PlanTripFormProps) {
           />
         </div>
       </div>
+
+      {errors.submit && (
+        <div className="p-4 rounded-xl bg-red-100 border-2 border-red-400 text-red-700 font-bold text-sm">
+          {errors.submit}
+        </div>
+      )}
 
       {/* Submit */}
       <button 
