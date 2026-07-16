@@ -168,4 +168,44 @@ router.get('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// DELETE /api/trips/:id — Delete a trip by ID (requires authentication)
+router.delete('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const tripId = req.params.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not identified' });
+      return;
+    }
+
+    if (typeof tripId !== 'string') {
+      res.status(400).json({ error: 'Invalid trip ID' });
+      return;
+    }
+
+    // First ensure the trip belongs to the user
+    const trip = await prisma.trip.findFirst({
+      where: {
+        id: tripId,
+        userId,
+      },
+    });
+
+    if (!trip) {
+      res.status(404).json({ error: 'Trip not found or unauthorized' });
+      return;
+    }
+
+    await prisma.trip.delete({
+      where: { id: tripId },
+    });
+
+    res.json({ success: true, message: 'Trip deleted successfully' });
+  } catch (error) {
+    console.error('Delete trip error:', error);
+    res.status(500).json({ error: 'Failed to delete trip' });
+  }
+});
+
 export default router;

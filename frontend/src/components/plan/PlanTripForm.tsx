@@ -48,6 +48,17 @@ export default function PlanTripForm({ onTopHalfComplete, onConceptsLoaded }: Pl
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const cityParam = params.get('city');
+    if (cityParam) {
+      setFormData((prev) => ({
+        ...prev,
+        city: cityParam,
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (loading) {
       interval = setInterval(() => {

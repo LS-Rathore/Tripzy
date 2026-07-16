@@ -16,8 +16,29 @@ export default function MyTripsPage() {
   const [trips, setTrips] = useState<TripSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tripToDelete, setTripToDelete] = useState<string | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const confirmDelete = async () => {
+    if (!tripToDelete) return;
+    
+    try {
+      const res = await fetch(`${API_URL}/api/trips/${tripToDelete}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete trip');
+      }
+      
+      setTrips((prevTrips) => prevTrips.filter(t => t.id !== tripToDelete));
+      setTripToDelete(null);
+    } catch (err: any) {
+      alert(err.message || 'Error deleting trip');
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -48,6 +69,37 @@ export default function MyTripsPage() {
   return (
     <div className="min-h-screen bg-tripzy-bg text-on-surface font-body-md flex flex-col relative overflow-hidden">
       
+      {/* Custom Delete Confirmation Modal */}
+      {tripToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-white p-8 rounded-2xl border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-sm w-full animate-fade-up">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-error">delete_forever</span>
+              </div>
+            </div>
+            <h3 className="text-2xl font-black font-display-lg text-center text-on-surface mb-2">Delete Trip?</h3>
+            <p className="text-center text-on-surface-variant font-medium mb-8">
+              Are you sure you want to delete this trip? This action cannot be undone and your itinerary will be lost forever.
+            </p>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setTripToDelete(null)}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-on-surface bg-surface-variant border-2 border-transparent hover:bg-outline-variant/30 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 py-3 px-4 rounded-xl font-black text-white bg-error border-[3px] border-[#251913] btn-shadow hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#251913] active:translate-y-[2px] active:shadow-none transition-all"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Playful Background Elements */}
       <div className="fixed inset-0 bg-pattern -z-10 opacity-30"></div>
       <div className="fixed top-[-10%] right-[-10%] w-[40%] h-[40%] bg-tripzy-orange/10 rounded-full blur-[120px] -z-10 animate-blob-morph"></div>
@@ -118,7 +170,14 @@ export default function MyTripsPage() {
                 <p className="text-on-surface-variant font-medium text-sm mb-6 line-clamp-2">
                   {trip.conceptName || 'Trip Concept'}
                 </p>
-                <div className="mt-auto pt-4 border-t-2 border-outline-variant flex justify-end">
+                <div className="mt-auto pt-4 border-t-2 border-outline-variant flex justify-between items-center">
+                  <button 
+                    onClick={() => setTripToDelete(trip.id)}
+                    className="text-error hover:bg-error/10 p-2 rounded-lg transition-colors flex items-center justify-center"
+                    title="Delete Trip"
+                  >
+                    <span className="material-symbols-outlined text-xl">delete</span>
+                  </button>
                   <Link
                     to={`/itinerary/${trip.id}`}
                     className="flex items-center gap-2 text-tripzy-orange font-bold group"

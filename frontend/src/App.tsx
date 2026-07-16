@@ -5,6 +5,9 @@ import LandingPage from './pages/LandingPage';
 import PlanTripPage from './pages/PlanTripPage';
 import ItineraryPage from './pages/ItineraryPage';
 import MyTripsPage from './pages/MyTripsPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import FeaturesPage from './pages/FeaturesPage';
+import ExplorePage from './pages/ExplorePage';
 import NotFoundPage from './pages/NotFoundPage';
 import './App.css';
 
@@ -15,6 +18,9 @@ function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
 
           {/* Protected (require auth) */}
           <Route element={<ProtectedRoute />}>

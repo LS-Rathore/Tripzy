@@ -55,9 +55,9 @@ export default function Navbar() {
             
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex gap-6">
-              <a className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" href="/#how-it-works">How it works</a>
-              <a className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" href="/#features">Features</a>
-              <a className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" href="/#explore">Explore</a>
+              <Link className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" to="/how-it-works">How it works</Link>
+              <Link className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" to="/features">Features</Link>
+              <Link className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" to="/explore">Explore</Link>
               {user && (
                 <Link className="font-label-sm text-sm text-on-surface-variant hover:text-tripzy-orange hover:bg-tripzy-orange/10 px-3 py-1.5 rounded-lg transition-all font-bold" to="/my-trips">My Trips</Link>
               )}
