@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  googleId  String   @unique
+  name      String
+  email     String   @unique
+  avatar    String?
+  trips     Trip[]
+  createdAt DateTime @default(now())
+}
+
+model Trip {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  city              String
+  numberOfDays      Int
+  budgetPerDay      Float
+  travelStyle       String
+  interests         String[]
+  travelerType      String
+  totalEstimate     Float?
+  isBudgetRealistic Boolean?
+  budgetNote        String?
+  bestTimeToVisit   String?
+  thingsToAvoid     String[]
+  packingList       Json?
+  refined           Boolean  @default(false)
+  days              Day[]
+  createdAt         DateTime @default(now())
+}
+
+model Day {
+  id            String         @id @default(uuid())
+  tripId        String
+  trip          Trip           @relation(fields: [tripId], references: [id])
+  dayNumber     Int
+  dailyCost     Float?
+  morningId     String?        @unique
+  morning       Activity?      @relation("MorningActivity", fields: [morningId], references: [id])
+  afternoonId   String?        @unique
+  afternoon     Activity?      @relation("AfternoonActivity", fields: [afternoonId], references: [id])
+  eveningId     String?        @unique
+  evening       Activity?      @relation("EveningActivity", fields: [eveningId], references: [id])
+  food          Food?
+  transportLegs TransportLeg[]
+  alternatives  String[]
+}
+
+model Activity {
+  id           String  @id @default(uuid())
+  title        String
+  location     String
+  cost         Float
+  photoUrl     String?
+  dayMorning   Day?    @relation("MorningActivity")
+  dayAfternoon Day?    @relation("AfternoonActivity")
+  dayEvening   Day?    @relation("EveningActivity")
+}
+
+model Food {
+  id        String @id @default(uuid())
+  dayId     String @unique
+  day       Day    @relation(fields: [dayId], references: [id])
+  breakfast String
+  lunch     String
+  dinner    String
+}
+
+model TransportLeg {
+  id     String @id @default(uuid())
+  dayId  String
+  day    Day    @relation(fields: [dayId], references: [id])
+  from   String
+  to     String
+  mode   String
+  cost   Float
+}
