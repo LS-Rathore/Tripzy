@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/routing/ProtectedRoute';
+import ScrollToTop from './components/routing/ScrollToTop';
 import LandingPage from './pages/LandingPage';
 import PlanTripPage from './pages/PlanTripPage';
 import ItineraryPage from './pages/ItineraryPage';
@@ -19,6 +20,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />

@@ -9,20 +9,20 @@ export default function SupportPage() {
       
       <Navbar />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-6 md:px-10 py-16 relative z-10">
-        <div className="bento-card bg-white p-8 md:p-12 rounded-3xl border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-          <div className="inline-block bg-brand-teal text-white font-black px-3 py-1 rounded-lg transform -rotate-2 w-max shadow-lg mb-6 text-sm uppercase tracking-wide">
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 md:px-6 py-10 relative z-10">
+        <div className="bento-card bg-white p-6 md:p-8 rounded-2xl border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="inline-block bg-brand-teal text-white font-black px-3 py-1 rounded-lg transform -rotate-2 w-max shadow-md mb-4 text-xs uppercase tracking-wide">
             Help Center
           </div>
           
-          <h1 className="font-display-lg text-4xl md:text-5xl font-black text-on-surface mb-4 leading-tight tracking-tight">
+          <h1 className="font-display-lg text-3xl md:text-4xl font-black text-on-surface mb-4 leading-tight tracking-tight">
             How can we help?
           </h1>
-          <p className="text-on-surface-variant font-medium text-lg mb-8">
+          <p className="text-on-surface-variant font-medium text-base mb-6">
             Having trouble planning your trip? We're here to make things right.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="p-6 border-[3px] border-black rounded-2xl bg-surface-variant hover:-translate-y-1 transition-transform">
               <span className="material-symbols-outlined text-4xl text-tripzy-orange mb-4">mail</span>
               <h3 className="font-display-lg text-xl font-black mb-2">Email Support</h3>
