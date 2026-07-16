@@ -3,134 +3,216 @@ import Navbar from '../components/layout/Navbar';
 
 export default function LandingPage() {
   return (
-    <div className="bg-background text-on-surface font-body-md overflow-x-hidden">
+    <div className="bg-surface text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-white min-h-screen flex flex-col">
+      {/* Watermark Backgrounds */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="watermark-text font-black absolute -top-10 -left-20 rotate-12">Tripzy!</div>
+        <div className="watermark-text font-black absolute top-1/2 -right-20 -rotate-12">Tripzy!</div>
+        <div className="watermark-text font-black absolute -bottom-10 left-1/3 rotate-6">Tripzy!</div>
+      </div>
+
+      {/* TopNavBar */}
       <Navbar />
 
-      {/* Hero Section */}
-      <header className="relative overflow-hidden pt-12 pb-20 md:pt-24 md:pb-32 bg-gradient-to-b from-surface to-surface-container-low">
-        <div className="absolute inset-0 z-0 opacity-30" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_E18oI5GGywFZ0Bt2JTCrIL7uja8C-dBymoWbCLK9sMM9SFZXJp0dhn45mfLN5lgDREVJhiFGFd6nHwp98ias7_RUcClIuvOGygo4qu36sxR_R1x3rrcu7HDrFrQc6tzj8pORT8xei-0_ehRFA4bVq1khUyCMgjT70GN337gpInb470Qo0a7DrW3NRbSa7fpYq4H0EIiBYaOsbjs5cx_n4PxkXR58UlsSnY8W61UAqrUpS6ZFERbPjQ")', backgroundSize: 'cover', backgroundPosition: 'center center', backgroundRepeat: 'no-repeat', maskImage: 'linear-gradient(to bottom, black 0%, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 70%, transparent 100%)' }}></div>
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 gap-12 items-center">
-          <div className="z-10 text-center">
-            <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-6 leading-tight">
-              Plan your perfect India trip in seconds
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl mx-auto">
-              Tripzy builds real, budget-aware itineraries with hidden local gems — like advice from a friend who actually lives there.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/plan" className="px-8 py-4 bg-primary-container text-on-primary-fixed-variant rounded-full font-headline-md text-headline-md hover:shadow-lg transition-all scale-100 hover:scale-105 active:scale-95 text-center">
-                Plan My Trip
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <main className="relative flex-1">
+        {/* Hero Section */}
+        <section className="relative px-margin-mobile md:px-margin-desktop pt-12 pb-16 max-w-container-max mx-auto text-center">
 
-      {/* Why Tripzy Strip */}
-      <section className="py-24 bg-[#F0F9F9]" id="features">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-brand-teal text-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-4xl">psychology</span>
-              </div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-3">AI-Powered Itineraries</h3>
-              <p className="text-on-surface-variant font-body-md">Optimized routes that maximize your time and hit every must-see landmark without the burnout.</p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-brand-teal text-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-4xl">local_activity</span>
-              </div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Real Local Spots</h3>
-              <p className="text-on-surface-variant font-body-md">Skip the tourist traps. We find the authentic cafes and quiet corners locals love.</p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-brand-teal text-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-md">
-                <span className="material-symbols-outlined text-4xl">savings</span>
-              </div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Budget-Aware Planning</h3>
-              <p className="text-on-surface-variant font-body-md">Real-time estimations based on your daily spending limit, covering stays, food, and transport.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-24 bg-surface-container-low relative overflow-hidden" id="how-it-works">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-          <h2 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-center text-on-surface mb-20">Your Trip in 3 Easy Steps</h2>
-          <div className="relative flex flex-col md:flex-row justify-between gap-12">
-            <div className="flex-1 relative z-10 text-center flex flex-col items-center">
-              <div className="step-line w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 ambient-shadow">1</div>
-              <h4 className="font-headline-md text-headline-md mb-4 text-on-surface">Tell us your vibes</h4>
-              <p className="text-on-surface-variant">Enter your destination, dates, and budget. Choose your travel style.</p>
-            </div>
-            <div className="flex-1 relative z-10 text-center flex flex-col items-center">
-              <div className="step-line w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 ambient-shadow">2</div>
-              <h4 className="font-headline-md text-headline-md mb-4 text-on-surface">Tripzy builds it</h4>
-              <p className="text-on-surface-variant">Our AI cross-references local data to create a custom map-based plan.</p>
-            </div>
-            <div className="flex-1 relative z-10 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 ambient-shadow">3</div>
-              <h4 className="font-headline-md text-headline-md mb-4 text-on-surface">Refine and go</h4>
-              <p className="text-on-surface-variant">Swap spots, book stays directly, and share the itinerary with friends.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Strip */}
-      <section className="py-12 bg-surface-container border-y border-outline-variant/30">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left">
-          <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Trusted for trips across India</p>
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12 opacity-60 grayscale hover:grayscale-0 transition-all">
-            <span className="font-headline-md text-headline-md font-bold">DELHI</span>
-            <span className="font-headline-md text-headline-md font-bold text-secondary">JAIPUR</span>
-            <span className="font-headline-md text-headline-md font-bold">GOA</span>
-            <span className="font-headline-md text-headline-md font-bold text-secondary">MUMBAI</span>
-            <span className="font-headline-md text-headline-md font-bold">RISHIKESH</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-24 px-margin-mobile">
-        <div className="max-w-container-max mx-auto rounded-3xl bg-primary-container p-12 md:p-20 text-center relative overflow-hidden elevated-shadow">
-          <div className="absolute top-0 right-0 p-8 opacity-20">
-            <span className="material-symbols-outlined text-9xl">flight_takeoff</span>
-          </div>
-          <div className="relative z-10">
-            <h2 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-6">Your next trip is one click away</h2>
-            <p className="font-body-lg text-body-lg text-white/90 mb-12 max-w-2xl mx-auto">Join 10,000+ travelers exploring India the smart way. No more spreadsheets, just pure adventure.</p>
-            <Link to="/plan" className="inline-block px-12 py-5 bg-white text-primary font-headline-md text-headline-md rounded-full shadow-xl hover:shadow-2xl transition-all scale-100 hover:scale-105 active:scale-95">
-              Start Planning Now
+          <h1 className="font-display-lg text-display-lg md:text-6xl leading-[0.9] font-black text-on-surface mb-8 tracking-tighter">
+            Let's plan your <br /> <span className="text-primary-container italic">Dream Trip!</span>
+          </h1>
+          <p className="max-w-2xl mx-auto font-body-lg text-body-lg text-on-surface-variant mb-12 font-medium">
+            Say goodbye to generic travel guides. Get a hyper-personalized India itinerary powered by AI that knows the hidden chai stalls and the best sunset peaks.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link to="/plan" className="bg-primary-container text-white px-10 py-5 rounded-xl font-bold text-lg btn-shadow flex items-center gap-2 hover:bg-primary transition-all border-[3px] border-[#251913]">
+              Start Planning 🏔️
             </Link>
           </div>
-        </div>
-      </section>
+
+          {/* Floating Decorative Elements */}
+          <div className="absolute top-[15%] left-2 md:left-12 xl:left-24 hidden sm:block">
+            <div className="bento-card bg-white p-4 rotate-12 rounded-xl">
+              <span className="text-3xl">🛕</span>
+            </div>
+          </div>
+          <div className="absolute bottom-[15%] left-6 md:left-20 xl:left-32 hidden sm:block">
+            <div className="bento-card bg-white p-4 -rotate-12 rounded-xl">
+              <span className="text-3xl">🛺</span>
+            </div>
+          </div>
+          
+          <div className="absolute top-[20%] right-6 md:right-20 xl:right-32 hidden sm:block">
+            <div className="bento-card bg-white p-4 rotate-6 rounded-xl">
+              <span className="text-3xl">🦚</span>
+            </div>
+          </div>
+          <div className="absolute bottom-[15%] right-2 md:right-12 xl:right-24 hidden sm:block">
+            <div className="bento-card bg-white p-4 -rotate-6 rounded-xl">
+              <span className="text-3xl"> 🪷 </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="bg-surface-container-low py-16 px-margin-mobile md:px-margin-desktop border-y-[3px] border-[#251913]">
+          <div className="max-w-container-max mx-auto">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-4">
+              <div className="max-w-xl">
+                <h2 className="font-headline-md text-headline-md font-black text-on-surface mb-4">Why Tripzy? ✨</h2>
+                <p className="text-on-surface-variant font-body-md font-medium">We've blended local Indian hospitality with state-of-the-art intelligence to build the ultimate explorer's tool.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {/* Feature 1 */}
+              <div className="bento-card bg-white p-8 rounded-2xl flex flex-col items-start gap-6 group">
+                <div className="w-16 h-16 bg-primary-container/10 flex items-center justify-center rounded-2xl text-primary-container group-hover:scale-110 transition-transform border-[2px] border-primary-container">
+                  <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
+                </div>
+                <h3 className="font-headline-md text-xl font-bold">AI-Powered Itineraries</h3>
+                <p className="text-on-surface-variant font-medium">Our AI analyzes millions of data points to create routes that actually make sense for your pace and preferences.</p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="bento-card bg-secondary-container p-8 rounded-2xl flex flex-col items-start gap-6 group">
+                <div className="w-16 h-16 bg-white/50 flex items-center justify-center rounded-2xl text-secondary group-hover:scale-110 transition-transform border-[2px] border-secondary">
+                  <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>explore</span>
+                </div>
+                <h3 className="font-headline-md text-xl font-bold">Local Gems</h3>
+                <p className="text-on-surface-variant font-medium">Skip the tourist traps. We find the authentic spots only the locals know about, from Varanasi to Valparai.</p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="bento-card bg-tertiary-fixed p-8 rounded-2xl flex flex-col items-start gap-6 group">
+                <div className="w-16 h-16 bg-white/50 flex items-center justify-center rounded-2xl text-tertiary group-hover:scale-110 transition-transform border-[2px] border-tertiary">
+                  <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
+                </div>
+                <h3 className="font-headline-md text-xl font-bold">Budget Friendly</h3>
+                <p className="text-on-surface-variant font-medium">Get smart cost estimations and ways to save on domestic flights, trains, and heritage stays.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Social Proof/Destinations Grid */}
+        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+          <h2 className="font-headline-md text-headline-md font-black text-on-surface text-center mb-16">Explore India's Favorites 🇮🇳</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+            {/* Destination 1: Delhi */}
+            <div className="group relative overflow-hidden rounded-2xl bento-card aspect-[4/5]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvL5I-BzM6YMcC2Z76Tbdo7YON657E4cXg_VVB9PO0CAU5Ff_dVg0Ct0mVmiPVdQ56BxvucRTC2WRF2cNMviztdzrH7OjBcGjUA5XjvM5XV3W2vbS0yRGgFPbpr7-Mn4ovuTOf4SXLGC_94pbRmcIFWa4CRHYRlFPKSq8f4ZxnspJc4-R3FKVJ4F2-iRjYyGNFP9yuJaWzL_fJKuc0zEArVbqXR_cvnJXY4mx2q1nw2kbGN1YAg6ukXg')" }}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <span className="text-label-sm font-bold bg-primary-container px-2 py-1 rounded mb-2 inline-block border-[2px] border-black">Popular</span>
+                <h4 className="font-bold text-2xl font-headline-md">Delhi</h4>
+                <p className="text-sm opacity-90 font-medium">History & Street Food</p>
+              </div>
+            </div>
+
+            {/* Destination 2: Jaipur */}
+            <div className="group relative overflow-hidden rounded-2xl bento-card aspect-[4/5] md:translate-y-8">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBz_JzsGDGIRt8ddpHxGTbbsfbLt_qq_Y6If9l9TgSXmh8I4GJdr7NxPIGGWdySDabU1U1ryboBcNYCLdjKZzxhwtX5s8_5MYTAm_8lk6jWSu3YnQgw8KEk4H9nHl394BfD8rTUXcV7sISnQdY2DwGJPcw58sC9vAgYpmN1Vvb3BCEmnfVMulwvoe3aijaxTgUA6Rigj0RSwLqyKo-Ys4mHiNpZ5iV4mSTJlKd8OenLL_yqB6Gzps3-2w')" }}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <span className="text-label-sm font-bold bg-secondary px-2 py-1 rounded mb-2 inline-block border-[2px] border-black">Heritage</span>
+                <h4 className="font-bold text-2xl font-headline-md">Jaipur</h4>
+                <p className="text-sm opacity-90 font-medium">Royal Palaces & Forts</p>
+              </div>
+            </div>
+
+            {/* Destination 3: Goa */}
+            <div className="group relative overflow-hidden rounded-2xl bento-card aspect-[4/5]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAILc__dVuLQpEfEOwBqcmufc-da_7ue_bcW1C5vIMDkyzOXS7eycTwT_SY6ggXhFT_QRdWFk6wz0J5nSuKJud2gbEFKaleX9P0uldYGiMJ2eYYinqStMASDTCy77QfM7bPWkgaczRPI8aYG5oq0JJglwKRsnf_AVaQxCDyyiQPEN_fjfos2YopB956c1QFDMU9YIf-F5ySxDRpxqB-C3U79Yn65tHDc0nugVNC20lXY5uBjb1QQFsMsA')" }}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <span className="text-label-sm font-bold bg-tertiary-container px-2 py-1 rounded mb-2 inline-block border-[2px] border-black">Relax</span>
+                <h4 className="font-bold text-2xl font-headline-md">Goa</h4>
+                <p className="text-sm opacity-90 font-medium">Sun, Sand & Serenity</p>
+              </div>
+            </div>
+
+            {/* Destination 4: Kerala */}
+            <div className="group relative overflow-hidden rounded-2xl bento-card aspect-[4/5] md:translate-y-8">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuARDnb1ZvmJynLXHXipALmwtmJ_hpFSo2528l_a_PwrPFwa1AK2JYVELaEmx89Go6iniXxdeIdbLO8rI7hY55qn853ltTJ_KUdJUUAJrS2BKWNn2PDQMXx_VSOZrTXHnTYdD0sQ7i1Lb4dVIEazTMbE0Xm6hMztqn_NSrPli_t7hgC203x9TF7Huvbvyo5axFvmlwU7tQa39DnZOtDBD-eygmMtmcZYgrDtX-JQZ5Mj-dIaLlXd63xUjw')" }}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute bottom-6 left-6 text-white">
+                <span className="text-label-sm font-bold bg-error px-2 py-1 rounded mb-2 inline-block border-[2px] border-black">Nature</span>
+                <h4 className="font-bold text-2xl font-headline-md">Kerala</h4>
+                <p className="text-sm opacity-90 font-medium">Backwaters & Lush Greenery</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA Banner */}
+        <section className="py-16 px-margin-mobile md:px-margin-desktop">
+          <div className="max-w-container-max mx-auto">
+            <div className="bento-card bg-primary-container p-8 md:p-12 rounded-[40px] text-center relative overflow-hidden">
+              {/* Subtle pattern overlay */}
+              <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #fff 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+              <div className="relative z-10">
+                <h2 className="font-display-lg text-4xl md:text-5xl font-black text-white mb-8 tracking-tighter">
+                  Ready to discover <br /> the real India?
+                </h2>
+                <p className="text-white/90 text-xl mb-12 max-w-xl mx-auto font-medium">
+                  Join over 50,000+ travelers who use Tripzy to plan adventures that last a lifetime.
+                </p>
+                <Link to="/plan" className="bg-white text-primary-container px-8 md:px-12 py-6 rounded-2xl font-black text-xl md:text-2xl btn-shadow flex items-center justify-center gap-3 mx-auto hover:scale-[1.02] active:scale-95 transition-transform border-[3px] border-[#251913] max-w-lg">
+                  Start Your Next Adventure 🌴
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-surface py-16 border-t border-surface-variant">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
-            <div className="space-y-4">
-              <img alt="Tripzy Logo" className="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFmvmck7staTZo3fnqI5l0PWRG5XZzUP6Y1ay_r6e5qjkHjADZWvCgF3cNFhzC24es4Mv_dkZ0tcb0Y1-p-soNFbu65Iwf0FA6AF0eqtCThXXkd4kzboj5WbU7vEyf_qi4YUu5dMS9oTxZ32d1LWruRqAB5BV1AlBw8hc1aiaA4bi5cFogS7p299OSlr5R7V2036DpMcACUzxjHp-91clYno7HG0liLGOwDjbu9ZXj4eRS_EdE9u2O1Q" />
-              <p className="text-on-surface-variant font-body-md max-w-xs">Intelligent itineraries for the modern explorer. Experience the real India, effortlessly.</p>
-            </div>
-            <div className="flex flex-wrap gap-8">
-              <a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">About Us</a>
-              <a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
-              <a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
-              <a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
-            </div>
-          </div>
-          <div className="mt-16 pt-8 border-t border-surface-variant flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-on-surface-variant font-label-sm text-label-sm">© 2026 Tripzy AI. Discover India, intelligently.</p>
-            <div className="flex gap-4">
-              <a className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all" href="#"><span className="material-symbols-outlined">public</span></a>
-              <a className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all" href="#"><span className="material-symbols-outlined">share</span></a>
+      <footer className="w-full bg-surface-container-high dark:bg-surface-container-highest rounded-t-[32px] mt-12 border-t-[3px] border-[#251913]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto">
+          <div className="flex flex-col gap-4">
+            <div className="text-headline-md font-headline-md font-black text-primary dark:text-primary-fixed">Tripzy!</div>
+            <p className="text-on-surface-variant font-body-md font-medium">Adventure awaits. Plan smarter, travel deeper with our AI concierge.</p>
+            <div className="flex gap-4 mt-2">
+              <a className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary-container hover:text-white transition-colors border-[2px] border-[#251913] shadow-[2px_2px_0px_0px_#251913]" href="#">
+                <span className="material-symbols-outlined text-xl">share</span>
+              </a>
+              <a className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary-container hover:text-white transition-colors border-[2px] border-[#251913] shadow-[2px_2px_0px_0px_#251913]" href="#">
+                <span className="material-symbols-outlined text-xl">language</span>
+              </a>
             </div>
           </div>
+
+          <div className="flex flex-col gap-4">
+            <h5 className="font-bold text-on-surface text-lg">Plan</h5>
+            <ul className="flex flex-col gap-3">
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">AI Planner</a></li>
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">Pricing</a></li>
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">Destinations</a></li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h5 className="font-bold text-on-surface text-lg">Trust</h5>
+            <ul className="flex flex-col gap-3">
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">Safety</a></li>
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">Support</a></li>
+              <li><a className="text-on-surface-variant font-medium hover:text-primary underline underline-offset-4 transition-opacity" href="#">Terms</a></li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h5 className="font-bold text-on-surface text-lg">Newsletter</h5>
+            <p className="text-label-sm text-on-surface-variant">Get weekly travel tips & hidden gem alerts.</p>
+            <div className="flex flex-col gap-3">
+              <input className="px-4 py-3 rounded-xl border-[3px] border-[#251913] bg-white focus:border-primary-container outline-none transition-all focus:shadow-[4px_4px_0px_0px_#251913] font-medium" placeholder="Your email" type="email" />
+              <button className="bg-on-surface text-surface py-3 rounded-xl font-bold border-[3px] border-[#251913] btn-shadow active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">Subscribe</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center pb-8 border-t-[3px] border-[#251913] pt-8 px-margin-desktop bg-surface-variant">
+          <p className="text-label-sm text-on-surface-variant font-bold">© 2026 Tripzy. Adventure awaits.</p>
         </div>
       </footer>
     </div>

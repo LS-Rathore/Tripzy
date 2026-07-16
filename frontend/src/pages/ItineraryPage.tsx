@@ -1,5 +1,6 @@
 import Navbar from '../components/layout/Navbar';
 
+
 export default function ItineraryPage() {
   return (
     <div className="min-h-screen bg-tripzy-bg text-on-surface font-body-md overflow-x-hidden">

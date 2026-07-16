@@ -191,4 +191,24 @@
     background-size: 24px 24px;
     opacity: 0.1;
   }
+
+  .watermark-text {
+    @apply pointer-events-none select-none -z-10 opacity-[0.04] text-[15rem] leading-none tracking-tight;
+  }
+
+  .bento-card {
+    @apply border-[3px] border-[#251913] shadow-[8px_8px_0px_0px_#251913] transition-transform duration-200;
+  }
+
+  .bento-card:hover {
+    @apply -translate-x-[2px] -translate-y-[2px] shadow-[10px_10px_0px_0px_#251913];
+  }
+
+  .btn-shadow {
+    @apply shadow-[4px_4px_0px_0px_#251913];
+  }
+
+  .btn-shadow:active {
+    @apply translate-x-[2px] translate-y-[2px] shadow-[0px_0px_0px_0px_#251913];
+  }
 }
