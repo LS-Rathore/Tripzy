@@ -79,44 +79,45 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
     <>
       {/* Floating Action Button */}
       <button
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 w-16 h-16 bg-brand-teal text-white rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-3xl z-50 transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${isOpen ? 'scale-0' : 'scale-100'}`}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed bottom-6 right-6 w-16 h-16 bg-brand-teal text-white rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center z-50 transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none`}
       >
-        👋
+        <span className={`material-symbols-outlined text-3xl font-black transition-transform duration-300 ${isOpen ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`}>
+          smart_toy
+        </span>
+        <span className={`material-symbols-outlined text-3xl font-black absolute transition-transform duration-300 ${isOpen ? 'rotate-0 scale-100' : '-rotate-90 scale-0'}`}>
+          close
+        </span>
       </button>
 
-      {/* Chat Window Overlay */}
+      {/* Chat Window Popup Card */}
       <div 
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-end transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}
+        className={`fixed bottom-28 right-6 w-[calc(100vw-3rem)] md:w-[400px] h-[600px] max-h-[75vh] bg-tripzy-bg rounded-3xl border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col z-40 origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden ${isOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-50 opacity-0 pointer-events-none'}`}
       >
-        {/* Chat Drawer */}
-        <div 
-          className={`bg-tripzy-bg w-full max-w-sm h-[90vh] md:h-screen md:max-w-md border-l-[3px] border-t-[3px] md:border-t-0 border-black shadow-[-8px_0px_0px_0px_rgba(0,0,0,1)] flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 translate-y-0 mt-[10vh] md:mt-0 rounded-t-3xl md:rounded-none' : 'translate-y-full md:translate-y-0 md:translate-x-full'}`}
-        >
-          {/* Header */}
-          <div className="bg-brand-teal p-5 border-b-[3px] border-black flex justify-between items-center rounded-t-3xl md:rounded-none">
-            <div className="flex items-center gap-3">
-              <div className="bg-white p-2 rounded-xl border-2 border-black text-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">🤖</div>
-              <div>
-                <h3 className="font-display-lg font-black text-white text-xl">Local Friend</h3>
-                <p className="text-white/80 font-bold text-xs">Answering questions about Day {activeDay}</p>
-              </div>
+        {/* Header */}
+        <div className="bg-brand-teal p-5 border-b-[3px] border-black flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-white p-2 rounded-xl border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <span className="material-symbols-outlined font-black text-brand-teal">psychology</span>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="w-10 h-10 bg-white rounded-xl border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-black active:translate-y-1 active:translate-x-1 active:shadow-none"
-            >
-              ✕
-            </button>
+            <div>
+              <h3 className="font-display-lg font-black text-white text-xl flex items-center gap-2">
+                Local Friend
+                <span className="material-symbols-outlined text-sm text-tripzy-yellow animate-pulse">auto_awesome</span>
+              </h3>
+              <p className="text-white/90 font-bold text-xs">Day {activeDay} Context Active</p>
+            </div>
           </div>
+        </div>
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                <div className="text-6xl animate-bounce">👋</div>
+                <div className="bg-white border-[3px] border-black rounded-full p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-2">
+                  <span className="material-symbols-outlined text-6xl text-brand-teal animate-pulse block">robot_2</span>
+                </div>
                 <h4 className="font-headline-md font-black text-xl">Hey! I'm your local friend.</h4>
                 <p className="text-on-surface-variant font-medium text-sm max-w-[250px]">
                   I know everything about your itinerary for Day {activeDay}. Need help finding a rickshaw, picking an outfit, or finding street food? Just ask!
@@ -175,9 +176,9 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask your local friend..."
+                placeholder="Ask anything..."
                 disabled={isLoading}
-                className="flex-1 bg-surface-container border-[3px] border-black rounded-xl px-4 py-3 font-bold text-sm focus:outline-none focus:ring-4 focus:ring-brand-teal/30"
+                className="flex-1 bg-surface-container border-[3px] border-black rounded-xl px-4 py-3 font-bold text-sm focus:outline-none focus:ring-4 focus:ring-brand-teal/30 shadow-[inset_0px_2px_4px_rgba(0,0,0,0.1)]"
               />
               <button
                 type="submit"
@@ -189,7 +190,6 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
             </form>
           </div>
         </div>
-      </div>
     </>
   );
 }
