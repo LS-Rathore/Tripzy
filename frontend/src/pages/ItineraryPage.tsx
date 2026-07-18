@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
+import TripMap from '../components/trip/TripMap';
+import LocalFriendChat from '../components/trip/LocalFriendChat';
 
 import type { Trip, PrimaryDayPlan, AlternativeDayPlan, ItineraryOption } from '../types/Trip';
 
@@ -442,6 +444,9 @@ export default function ItineraryPage() {
           </div>
         )}
       </main>
+
+      {/* Floating AI Chat Widget */}
+      <LocalFriendChat tripId={trip.id} activeDay={activeDay} />
     </div>
   );
 }

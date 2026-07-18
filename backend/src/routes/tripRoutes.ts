@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { prisma } from '../config/db.js';
 import { generateTripConcepts } from '../services/tripConceptService.js';
 import { generateTripItinerary } from '../services/tripItineraryService.js';
+import { generateLocalFriendResponse } from '../services/aiChatService.js';
 import { requireAuth, type AuthRequest } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -205,6 +206,42 @@ router.delete('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Delete trip error:', error);
     res.status(500).json({ error: 'Failed to delete trip' });
+  }
+});
+
+// POST /api/trips/:tripId/chat — Interact with the AI Local Friend
+router.post('/:tripId/chat', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'User not identified' });
+      return;
+    }
+
+    const { tripId } = req.params;
+    const { message, history, activeDay } = req.body;
+
+    if (!message || !activeDay) {
+      res.status(400).json({ error: 'Missing message or activeDay' });
+      return;
+    }
+
+    // Fetch the trip to get context
+    const trip = await prisma.trip.findFirst({
+      where: { id: tripId, userId },
+    });
+
+    if (!trip) {
+      res.status(404).json({ error: 'Trip not found' });
+      return;
+    }
+
+    const aiResponse = await generateLocalFriendResponse(message, history || [], trip, Number(activeDay));
+    
+    res.json({ response: aiResponse });
+  } catch (error: any) {
+    console.error('Chat endpoint error:', error);
+    res.status(500).json({ error: error.message || 'Failed to communicate with Local Friend.' });
   }
 });
 
