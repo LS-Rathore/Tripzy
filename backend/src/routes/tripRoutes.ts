@@ -228,7 +228,7 @@ router.post('/:tripId/chat', requireAuth, async (req: AuthRequest, res: Response
 
     // Fetch the trip to get context
     const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId },
+      where: { id: tripId as string, userId },
     });
 
     if (!trip) {
