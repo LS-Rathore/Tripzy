@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 
@@ -196,10 +196,26 @@ const DESTINATIONS: Destination[] = [
 export default function ExplorePage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [displayedDestinations, setDisplayedDestinations] = useState<Destination[]>([]);
+  const [shuffleKey, setShuffleKey] = useState<number>(0);
 
-  const filteredDestinations = activeCategory === 'all'
-    ? DESTINATIONS
-    : DESTINATIONS.filter(d => d.category === activeCategory);
+  useEffect(() => {
+    if (activeCategory === 'all') {
+      const pickRandom = () => {
+        const shuffled = [...DESTINATIONS].sort(() => Math.random() - 0.5);
+        setDisplayedDestinations(shuffled.slice(0, 6));
+        setShuffleKey(prev => prev + 1);
+      };
+
+      pickRandom();
+      const intervalId = setInterval(pickRandom, 8000);
+      return () => clearInterval(intervalId);
+    } else {
+      const filtered = DESTINATIONS.filter(d => d.category === activeCategory);
+      setDisplayedDestinations(filtered);
+      setShuffleKey(prev => prev + 1);
+    }
+  }, [activeCategory]);
 
   const handleQuickPlan = (city: string) => {
     navigate(`/plan?city=${encodeURIComponent(city)}`);
@@ -255,11 +271,11 @@ export default function ExplorePage() {
         </div>
 
         {/* Destination Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {filteredDestinations.map((dest, index) => (
+        <div key={shuffleKey} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          {displayedDestinations.map((dest, index) => (
             <div
               key={dest.city}
-              className="bento-card bg-white rounded-2xl border-[3px] border-black overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-fade-up"
+              className="bento-card bg-white rounded-2xl border-[3px] border-black overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-premium-shuffle"
               style={{ animationDelay: `${index * 0.08}s` }}
             >
               {/* Image Container */}
