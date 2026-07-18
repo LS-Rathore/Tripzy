@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import LocalFriendChat from '../components/trip/LocalFriendChat';
+import TripExpenses from '../components/trip/TripExpenses';
 
 import type { Trip, PrimaryDayPlan, AlternativeDayPlan, ItineraryOption } from '../types/Trip';
 
@@ -14,6 +15,7 @@ export default function ItineraryPage() {
   // UI state
   const [activeDay, setActiveDay] = useState(1);
   const [activePlanType, setActivePlanType] = useState<'Primary' | 'Alt1' | 'Alt2'>('Primary');
+  const [activeTab, setActiveTab] = useState<'itinerary' | 'expenses'>('itinerary');
   const [selections, setSelections] = useState<Record<string, number>>({});
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -297,7 +299,29 @@ export default function ItineraryPage() {
           </div>
         </div>
 
-        {/* Day Navigation Tabs */}
+        {/* --- MAIN CONTENT TOGGLE --- */}
+        {trip.travelerType === 'Friends' || trip.travelerType === 'Squad' ? (
+          <div className="flex bg-surface-container p-1.5 rounded-2xl border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-sm mx-auto my-8">
+            <button 
+              onClick={() => setActiveTab('itinerary')}
+              className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all ${activeTab === 'itinerary' ? 'bg-black text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-black'}`}
+            >
+              Itinerary
+            </button>
+            <button 
+              onClick={() => setActiveTab('expenses')}
+              className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all flex justify-center gap-2 items-center ${activeTab === 'expenses' ? 'bg-brand-teal text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-brand-teal'}`}
+            >
+              Expenses <span className="material-symbols-outlined text-sm">payments</span>
+            </button>
+          </div>
+        ) : null}
+
+        {activeTab === 'expenses' ? (
+          <TripExpenses trip={trip} />
+        ) : (
+          <>
+            {/* Day Navigation Tabs */}
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2 justify-center border-b-[3px] border-black pb-4">
             {itinerary.days.map((d) => (
@@ -440,7 +464,9 @@ export default function ItineraryPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-black/10 text-xs font-bold italic text-on-surface-variant">
               💡 To select this alternative plan for Day {activeDay}, simply follow this outline on your day out. It offers a fully thematic alternative to the primary slots!
             </div>
-          </div>
+            </div>
+          )}
+          </>
         )}
       </main>
 

@@ -39,7 +39,20 @@ model Trip {
   conceptVibe       String?
   startingFrom      String?
   rawItinerary      Json?
+  members           String[]  @default([])
+  expenses          Expense[]
   createdAt         DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  description String
+  amount      Float
+  paidBy      String
+  splitAmong  String[]
+  createdAt   DateTime @default(now())
 }
 
 model Day {

@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 import authRoutes from './routes/authRoutes.js';
 import tripRoutes from './routes/tripRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use(cookieParser());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/trips', expenseRoutes);
 
 app.get('/', (req, res) => {
   res.send('Tripzy API is running!');

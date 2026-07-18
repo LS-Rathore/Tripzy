@@ -76,5 +76,16 @@ export interface Trip {
   conceptName?: string | null;
   conceptVibe?: string | null;
   rawItinerary?: RawItinerary | null;
+  members?: string[];
+  expenses?: Expense[];
+}
+
+export interface Expense {
+  id: string;
+  tripId: string;
+  description: string;
+  amount: number;
+  paidBy: string;
+  splitAmong: string[];
   createdAt: string;
 }

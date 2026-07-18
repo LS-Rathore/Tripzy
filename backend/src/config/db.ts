@@ -13,3 +13,4 @@ const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
 export const prisma = new PrismaClient({ adapter });
+// Prisma client configuration loaded
