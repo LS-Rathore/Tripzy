@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
+
 import type { Trip, PrimaryDayPlan, AlternativeDayPlan, ItineraryOption } from '../types/Trip';
 
 export default function ItineraryPage() {
@@ -412,6 +413,7 @@ export default function ItineraryPage() {
                 </div>
               </div>
             )}
+
 
           </div>
         ) : (
