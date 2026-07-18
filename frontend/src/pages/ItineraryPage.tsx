@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
-import TripMap from '../components/trip/TripMap';
 import LocalFriendChat from '../components/trip/LocalFriendChat';
 
 import type { Trip, PrimaryDayPlan, AlternativeDayPlan, ItineraryOption } from '../types/Trip';

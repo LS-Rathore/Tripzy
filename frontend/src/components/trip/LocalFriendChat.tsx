@@ -53,7 +53,8 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
       });
 
       if (!res.ok) {
-        throw new Error('Failed to fetch response');
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to fetch response');
       }
 
       const data = await res.json();
