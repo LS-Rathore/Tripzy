@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Groq } from 'groq-sdk';
+import { conceptCache } from './cacheService.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
@@ -99,6 +100,23 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fence
 }
 
 export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsResponse> {
+  // --- Cache Check ---
+  const cacheKey = conceptCache.generateKey('concepts', {
+    city: trip.city.toLowerCase().trim(),
+    numberOfDays: trip.numberOfDays,
+    budgetPerDay: trip.budgetPerDay,
+    travelStyle: trip.travelStyle.toLowerCase().trim(),
+    interests: trip.interests,
+    travelerType: trip.travelerType.toLowerCase().trim(),
+  });
+
+  const cached = conceptCache.get<ConceptsResponse>(cacheKey);
+  if (cached) {
+    console.log(`[Cache HIT] Concepts for "${trip.city}" served from cache. Stats:`, conceptCache.getStats());
+    return cached;
+  }
+  console.log(`[Cache MISS] Generating fresh concepts for "${trip.city}"...`);
+
   const prompt = buildPrompt(trip);
 
   // 1. Try Gemini
@@ -122,6 +140,7 @@ export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsR
       }
 
       console.log('Successfully generated concepts using Gemini.');
+      conceptCache.set(cacheKey, parsed);
       return parsed;
     } catch (error: any) {
       console.warn('Gemini AI generation failed, falling back to Groq...', error.message || error);
@@ -147,6 +166,7 @@ export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsR
       }
 
       console.log('Successfully generated concepts using Groq.');
+      conceptCache.set(cacheKey, parsed);
       return parsed;
     } catch (error: any) {
       console.warn('Groq AI generation failed, falling back to Mock...', error.message || error);

@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Groq } from 'groq-sdk';
+import { itineraryCache } from './cacheService.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
@@ -171,6 +172,24 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fence
 }
 
 export async function generateTripItinerary(details: TripItineraryDetails): Promise<ItineraryResponse> {
+  // --- Cache Check ---
+  const cacheKey = itineraryCache.generateKey('itinerary', {
+    city: details.city.toLowerCase().trim(),
+    numberOfDays: details.numberOfDays,
+    budgetPerDay: details.budgetPerDay,
+    travelStyle: details.travelStyle.toLowerCase().trim(),
+    interests: details.interests,
+    travelerType: details.travelerType.toLowerCase().trim(),
+    conceptName: details.conceptName.toLowerCase().trim(),
+  });
+
+  const cached = itineraryCache.get<ItineraryResponse>(cacheKey);
+  if (cached) {
+    console.log(`[Cache HIT] Itinerary for "${details.city} - ${details.conceptName}" served from cache. Stats:`, itineraryCache.getStats());
+    return cached;
+  }
+  console.log(`[Cache MISS] Generating fresh itinerary for "${details.city} - ${details.conceptName}"...`);
+
   const prompt = buildItineraryPrompt(details);
 
   // 1. Try Gemini
@@ -194,6 +213,7 @@ export async function generateTripItinerary(details: TripItineraryDetails): Prom
       }
 
       console.log('Successfully generated itinerary using Gemini.');
+      itineraryCache.set(cacheKey, parsed);
       return parsed;
     } catch (error: any) {
       console.warn('Gemini AI itinerary generation failed, falling back to Groq...', error.message || error);
@@ -219,6 +239,7 @@ export async function generateTripItinerary(details: TripItineraryDetails): Prom
       }
 
       console.log('Successfully generated itinerary using Groq.');
+      itineraryCache.set(cacheKey, parsed);
       return parsed;
     } catch (error: any) {
       console.warn('Groq AI itinerary generation failed, falling back to Mock...', error.message || error);
