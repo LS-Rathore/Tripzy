@@ -300,22 +300,20 @@ export default function ItineraryPage() {
         </div>
 
         {/* --- MAIN CONTENT TOGGLE --- */}
-        {trip.travelerType === 'Friends' || trip.travelerType === 'Squad' ? (
-          <div className="flex bg-surface-container p-1.5 rounded-2xl border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-sm mx-auto my-8">
-            <button 
-              onClick={() => setActiveTab('itinerary')}
-              className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all ${activeTab === 'itinerary' ? 'bg-black text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-black'}`}
-            >
-              Itinerary
-            </button>
-            <button 
-              onClick={() => setActiveTab('expenses')}
-              className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all flex justify-center gap-2 items-center ${activeTab === 'expenses' ? 'bg-brand-teal text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-brand-teal'}`}
-            >
-              Expenses <span className="material-symbols-outlined text-sm">payments</span>
-            </button>
-          </div>
-        ) : null}
+        <div className="flex bg-surface-container p-1.5 rounded-2xl border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-sm mx-auto my-8">
+          <button 
+            onClick={() => setActiveTab('itinerary')}
+            className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all ${activeTab === 'itinerary' ? 'bg-black text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-black'}`}
+          >
+            Itinerary
+          </button>
+          <button 
+            onClick={() => setActiveTab('expenses')}
+            className={`flex-1 py-2.5 rounded-xl font-black text-base transition-all flex justify-center gap-2 items-center ${activeTab === 'expenses' ? 'bg-brand-teal text-white shadow-md' : 'bg-transparent text-on-surface-variant hover:text-brand-teal'}`}
+          >
+            Budget <span className="material-symbols-outlined text-sm">payments</span>
+          </button>
+        </div>
 
         {activeTab === 'expenses' ? (
           <TripExpenses trip={trip} />

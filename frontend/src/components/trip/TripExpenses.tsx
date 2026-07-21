@@ -13,6 +13,7 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
   const [newMemberName, setNewMemberName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const isSquad = trip.travelerType === 'Friends' || trip.travelerType === 'Squad';
 
   // Form state
   const [desc, setDesc] = useState('');
@@ -79,7 +80,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
 
   const submitExpense = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!desc || !amount || !paidBy || splitAmong.length === 0) return;
+    if (!desc || !amount) return;
+    if (isSquad && (!paidBy || splitAmong.length === 0)) return;
     
     setIsLoading(true);
     try {
@@ -92,8 +94,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
         body: JSON.stringify({
           description: desc,
           amount: Number(amount),
-          paidBy,
-          splitAmong
+          paidBy: isSquad ? paidBy : 'You',
+          splitAmong: isSquad ? splitAmong : ['You']
         })
       });
       
@@ -191,11 +193,57 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
 
   const settlements = calculateSettlements();
 
+  // --- Calculate Analytics ---
+  const totalBudget = trip.numberOfDays * trip.budgetPerDay;
+  const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const budgetPercentage = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
+  
+  let progressColor = 'bg-brand-teal';
+  if (budgetPercentage > 85) progressColor = 'bg-red-500';
+  else if (budgetPercentage > 70) progressColor = 'bg-tripzy-yellow';
+
+  const topSpender = isSquad && expenses.length > 0 
+    ? Object.entries(expenses.reduce((acc, exp) => { acc[exp.paidBy] = (acc[exp.paidBy] || 0) + exp.amount; return acc; }, {} as Record<string, number>))
+        .sort((a, b) => b[1] - a[1])[0][0]
+    : null;
+
   return (
     <div className="space-y-6 animate-fade-up">
-      {/* Top: Settlements Summary */}
-      <div className="bento-card bg-tripzy-yellow p-5 md:p-6 rounded-2xl border-[3px] border-black space-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <h2 className="font-display-lg font-black text-2xl mb-1">💸 Who Owes Who?</h2>
+      {/* Budget Analytics Dashboard */}
+      <div className="bento-card bg-surface p-5 md:p-6 rounded-2xl border-[3px] border-black space-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-2">
+          <div>
+            <h2 className="font-display-lg font-black text-2xl">Trip Budget</h2>
+            <p className="text-on-surface-variant font-bold text-sm">Monitor your spending</p>
+          </div>
+          <div className="text-right">
+            <div className="font-black text-3xl">₹{totalSpent.toLocaleString()} <span className="text-xl text-on-surface-variant">/ ₹{totalBudget.toLocaleString()}</span></div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-8 bg-surface-container rounded-xl border-[3px] border-black overflow-hidden relative">
+          <div 
+            className={`h-full ${progressColor} transition-all duration-1000 ease-out ${budgetPercentage > 0 ? 'border-r-[3px] border-black' : ''}`}
+            style={{ width: `${budgetPercentage}%` }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center font-black text-xs mix-blend-difference text-white">
+            {budgetPercentage.toFixed(1)}% Spent
+          </div>
+        </div>
+
+        {topSpender && (
+          <div className="pt-2 border-t-2 border-black/10 flex gap-4 text-sm font-bold text-on-surface-variant">
+            <div>
+              👑 Top Spender: <span className="text-black">{topSpender}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isSquad && (
+        <div className="bento-card bg-tripzy-yellow p-5 md:p-6 rounded-2xl border-[3px] border-black space-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 className="font-display-lg font-black text-2xl mb-1">💸 Who Owes Who?</h2>
         {members.length === 0 ? (
           <p className="font-bold text-sm text-on-surface-variant">Add some squad members to start tracking!</p>
         ) : expenses.length === 0 ? (
@@ -215,9 +263,11 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
           </div>
         )}
       </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Squad Management */}
+        {isSquad && (
         <div className="lg:col-span-1 bento-card bg-white p-5 rounded-2xl border-[3px] border-black h-fit">
           <h3 className="font-display-lg font-black text-lg mb-4 border-b-2 border-black pb-2">The Squad</h3>
           
@@ -247,15 +297,16 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
             ))}
           </div>
         </div>
+        )}
 
         {/* Right: Expenses List */}
-        <div className="lg:col-span-2 bento-card bg-white p-5 rounded-2xl border-[3px] border-black">
+        <div className={`bento-card bg-white p-5 rounded-2xl border-[3px] border-black ${isSquad ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
           <div className="flex justify-between items-center mb-5 border-b-2 border-black pb-3">
             <h3 className="font-display-lg font-black text-xl">Expenses</h3>
             <button 
               onClick={() => setIsModalOpen(true)}
-              disabled={members.length === 0}
-              className={`bg-brand-teal text-white px-4 py-2 rounded-xl border-[3px] border-black font-black text-sm flex items-center gap-1 transition-all ${members.length > 0 ? 'hover:-translate-y-1 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              disabled={isSquad && members.length === 0}
+              className={`bg-brand-teal text-white px-4 py-2 rounded-xl border-[3px] border-black font-black text-sm flex items-center gap-1 transition-all ${(!isSquad || members.length > 0) ? 'hover:-translate-y-1 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
             >
               <span className="material-symbols-outlined text-lg">add</span>
               Log Expense
@@ -267,9 +318,11 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
               <div key={exp.id} className="flex justify-between items-center p-3 bg-surface-container rounded-xl border-[3px] border-black hover:bg-white transition-colors group">
                 <div>
                   <h4 className="font-black text-base">{exp.description}</h4>
+                  {isSquad && (
                   <p className="text-xs font-bold text-on-surface-variant">
                     Paid by <span className="text-brand-teal">{exp.paidBy}</span> • Split among {exp.splitAmong.length}
                   </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-black text-lg text-tripzy-orange">₹{exp.amount}</span>
@@ -308,31 +361,35 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
                 <input required type="number" min="1" placeholder="0" className="w-full bg-surface-container p-2.5 rounded-xl border-[3px] border-black font-black text-lg outline-none focus:border-brand-teal" value={amount} onChange={e => setAmount(e.target.value)} />
               </div>
 
-              <div>
-                <label className="block font-black text-xs uppercase tracking-wider mb-1.5">Who Paid?</label>
-                <select required className="w-full bg-surface-container p-2.5 rounded-xl border-[3px] border-black font-bold text-sm outline-none focus:border-brand-teal appearance-none cursor-pointer" value={paidBy} onChange={e => setPaidBy(e.target.value)}>
-                  <option value="" disabled>Select member</option>
-                  {members.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-              </div>
+              {isSquad && (
+                <>
+                  <div>
+                    <label className="block font-black text-xs uppercase tracking-wider mb-1.5">Who Paid?</label>
+                    <select required className="w-full bg-surface-container p-2.5 rounded-xl border-[3px] border-black font-bold text-sm outline-none focus:border-brand-teal appearance-none cursor-pointer" value={paidBy} onChange={e => setPaidBy(e.target.value)}>
+                      <option value="" disabled>Select member</option>
+                      {members.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
 
-              <div>
-                <label className="block font-black text-xs uppercase tracking-wider mb-1.5">Split Among</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  <button type="button" onClick={() => setSplitAmong([...members])} className="px-2 py-1 rounded-lg border-2 border-black font-bold text-[10px] hover:bg-black hover:text-white transition-colors">Select All</button>
-                  <button type="button" onClick={() => setSplitAmong([])} className="px-2 py-1 rounded-lg border-2 border-black font-bold text-[10px] hover:bg-black hover:text-white transition-colors">Clear</button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-1">
-                  {members.map(m => (
-                    <label key={m} className={`flex items-center gap-2 p-1.5 rounded-lg border-2 border-black cursor-pointer transition-colors ${splitAmong.includes(m) ? 'bg-brand-teal text-white' : 'bg-white'}`}>
-                      <div className="w-3.5 h-3.5 border-2 border-current rounded flex items-center justify-center">
-                        {splitAmong.includes(m) && <span className="material-symbols-outlined text-[10px] font-black">check</span>}
-                      </div>
-                      <span className="font-bold text-xs truncate">{m}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+                  <div>
+                    <label className="block font-black text-xs uppercase tracking-wider mb-1.5">Split Among</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <button type="button" onClick={() => setSplitAmong([...members])} className="px-2 py-1 rounded-lg border-2 border-black font-bold text-[10px] hover:bg-black hover:text-white transition-colors">Select All</button>
+                      <button type="button" onClick={() => setSplitAmong([])} className="px-2 py-1 rounded-lg border-2 border-black font-bold text-[10px] hover:bg-black hover:text-white transition-colors">Clear</button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-1">
+                      {members.map(m => (
+                        <label key={m} className={`flex items-center gap-2 p-1.5 rounded-lg border-2 border-black cursor-pointer transition-colors ${splitAmong.includes(m) ? 'bg-brand-teal text-white' : 'bg-white'}`}>
+                          <div className="w-3.5 h-3.5 border-2 border-current rounded flex items-center justify-center">
+                            {splitAmong.includes(m) && <span className="material-symbols-outlined text-[10px] font-black">check</span>}
+                          </div>
+                          <span className="font-bold text-xs truncate">{m}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
 
               <button type="submit" disabled={isLoading} className="w-full bg-tripzy-orange text-white py-3 rounded-xl border-[3px] border-black font-black text-base uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 mt-2">
                 {isLoading ? 'Saving...' : 'Save Expense'}
