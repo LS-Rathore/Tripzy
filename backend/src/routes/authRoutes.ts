@@ -14,24 +14,27 @@ const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:5000').replace
 
 // Helper to get OAuth client for a request
 function getOAuthClient(req?: Request) {
-  const envBackend = process.env.BACKEND_URL;
-  let hostUrl = envBackend;
+  let hostUrl = process.env.BACKEND_URL;
   if (!hostUrl && req) {
     const proto = req.headers['x-forwarded-proto'] || req.protocol;
     hostUrl = `${proto}://${req.get('host')}`;
   }
-  const backendUrl = (hostUrl || 'http://localhost:5000').replace(/\/+$/, '');
+  let backendUrl = (hostUrl || 'http://localhost:5000').trim().replace(/\/+$/, '');
+  if (backendUrl.includes('onrender.com') && backendUrl.startsWith('http://')) {
+    backendUrl = backendUrl.replace('http://', 'https://');
+  }
   const redirectUri = `${backendUrl}/auth/google/callback`;
 
   return {
-    client: new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectUri),
+    client: new OAuth2Client(GOOGLE_CLIENT_ID.trim(), GOOGLE_CLIENT_SECRET.trim(), redirectUri),
     redirectUri,
   };
 }
 
 // Step 1: Redirect user to Google's OAuth consent screen
 router.get('/google', (req: Request, res: Response) => {
-  const { client } = getOAuthClient(req);
+  const { client, redirectUri } = getOAuthClient(req);
+  console.log('[OAuth Step 1] Initiating auth with redirectUri:', redirectUri);
   const authorizeUrl = client.generateAuthUrl({
     access_type: 'offline',
     scope: [
