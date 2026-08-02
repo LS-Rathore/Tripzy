@@ -83,11 +83,13 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     const token = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' });
 
+    const isCrossSite = process.env.NODE_ENV === 'production' || Boolean(process.env.BACKEND_URL?.startsWith('https'));
+
     // Set httpOnly cookie
     res.cookie('tripzy_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isCrossSite,
+      sameSite: isCrossSite ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
@@ -107,10 +109,11 @@ router.get('/me', requireAuth, (req: AuthRequest, res: Response) => {
 
 // Logout — clear the cookie
 router.post('/logout', (_req: Request, res: Response) => {
+  const isCrossSite = process.env.NODE_ENV === 'production' || Boolean(process.env.BACKEND_URL?.startsWith('https'));
   res.clearCookie('tripzy_token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isCrossSite,
+    sameSite: isCrossSite ? 'none' : 'lax',
     path: '/',
   });
   res.json({ message: 'Logged out' });
