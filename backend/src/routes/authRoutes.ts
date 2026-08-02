@@ -57,11 +57,8 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
   try {
     const { client, redirectUri } = getOAuthClient(req);
-    // Exchange code for tokens with explicit redirect_uri matching authorize call
-    const { tokens } = await client.getToken({
-      code,
-      redirect_uri: redirectUri,
-    });
+    console.log('[OAuth Callback] Exchanging code for tokens with redirectUri:', redirectUri);
+    const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
 
     // Get user info from Google
