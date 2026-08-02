@@ -12,15 +12,27 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tripzy-dev-secret-change-in-produc
 const FRONTEND_URL = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
 const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:5000').replace(/\/+$/, '');
 
-const oAuth2Client = new OAuth2Client(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  `${BACKEND_URL}/auth/google/callback`
-);
+// Helper to get OAuth client for a request
+function getOAuthClient(req?: Request) {
+  const envBackend = process.env.BACKEND_URL;
+  let hostUrl = envBackend;
+  if (!hostUrl && req) {
+    const proto = req.headers['x-forwarded-proto'] || req.protocol;
+    hostUrl = `${proto}://${req.get('host')}`;
+  }
+  const backendUrl = (hostUrl || 'http://localhost:5000').replace(/\/+$/, '');
+  const redirectUri = `${backendUrl}/auth/google/callback`;
+
+  return {
+    client: new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectUri),
+    redirectUri,
+  };
+}
 
 // Step 1: Redirect user to Google's OAuth consent screen
-router.get('/google', (_req: Request, res: Response) => {
-  const authorizeUrl = oAuth2Client.generateAuthUrl({
+router.get('/google', (req: Request, res: Response) => {
+  const { client } = getOAuthClient(req);
+  const authorizeUrl = client.generateAuthUrl({
     access_type: 'offline',
     scope: [
       'https://www.googleapis.com/auth/userinfo.profile',
@@ -41,12 +53,16 @@ router.get('/google/callback', async (req: Request, res: Response) => {
   }
 
   try {
-    // Exchange code for tokens
-    const { tokens } = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(tokens);
+    const { client, redirectUri } = getOAuthClient(req);
+    // Exchange code for tokens with explicit redirect_uri matching authorize call
+    const { tokens } = await client.getToken({
+      code,
+      redirect_uri: redirectUri,
+    });
+    client.setCredentials(tokens);
 
     // Get user info from Google
-    const ticket = await oAuth2Client.verifyIdToken({
+    const ticket = await client.verifyIdToken({
       idToken: tokens.id_token!,
       audience: GOOGLE_CLIENT_ID,
     });
