@@ -10,9 +10,21 @@ jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Ping Supabase API
         run: |
+          # Clean URL by removing trailing slashes or /rest/v1 if included in secret
+          BASE_URL=$(echo "${{ secrets.SUPABASE_URL }}" | sed 's/\/*$//' | sed 's/\/rest\/v1$//')
+          
+          echo "Pinging Supabase at: $BASE_URL/auth/v1/health"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/")
-          echo "Supabase Ping Response Code: $STATUS"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "$BASE_URL/auth/v1/health")
+            
+          echo "Supabase Health Response Code: $STATUS"
+
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Secondary Ping to REST API..."
+            REST_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rest/v1/?apikey=${{ secrets.SUPABASE_ANON_KEY }}")
+            echo "Supabase REST API Response Code: $REST_STATUS"
+          fi
