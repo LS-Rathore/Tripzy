@@ -51,49 +51,48 @@ TRIP DETAILS:
 - Traveler type: ${trip.travelerType}
 
 INSTRUCTIONS:
-Generate exactly 3 trip concepts, each with a genuinely different pacing/focus philosophy:
-1. "Relaxed Explorer" — slower pace, more downtime, fewer stops per day, comfort-prioritized
-2. "Balanced Highlights" — a mix of major must-see sights and authentic local experiences
-3. "Packed Adventurer" — maximum coverage, tightly scheduled, for travelers who want to see everything
+Generate exactly 3 trip concepts tailored to ${trip.city}, each with a genuinely different pacing/focus philosophy:
+1. Pacing 1 (Relaxed/Unhurried) — slower pace, more downtime, fewer stops per day, comfort-prioritized.
+2. Pacing 2 (Balanced Highlights) — a mix of major must-see sights and authentic local experiences.
+3. Pacing 3 (Packed Adventurer) — maximum coverage, tightly scheduled, for travelers who want to see everything.
 
-For each concept, provide:
-- A short vibe description (1-2 sentences, written like a local friend's honest take, not marketing copy)
-- Estimated total trip cost (realistic for the stated budget/style, in INR)
-- Whether this estimated cost fits "within", is "below", or "exceeds" their stated total budget of ₹${totalBudget}
-- 3-4 highlight teasers (short phrases, not full descriptions — just enough to hint at what's included)
-- A one-line note on who this concept suits best (e.g. "best if you want fewer early mornings")
-
-Do not generate full day-by-day details yet. Keep this response lightweight and fast.
+For each concept:
+- Give it a creative, vibrant name that reflects ${trip.city}'s unique culture/vibe (e.g., for Goa: "Sunsets & Heritage Trails", for Jaipur: "Royal Forts & Bazaar Secrets").
+- A short vibe description (1-2 sentences, written like a local friend's honest take).
+- Estimated total trip cost (realistic for the stated budget/style in INR).
+- Indicate whether this estimated cost fits "within", is "below", or "exceeds" their stated total budget of ₹${totalBudget}.
+- 3-4 highlight teasers (short 3-5 word phrases hinting at specific local experiences).
+- A one-line note on who this concept suits best (e.g., "Best for travelers who love quiet mornings and local tea spots").
 
 OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fences:
 {
   "concepts": [
     {
       "id": "relaxed-explorer",
-      "name": "Relaxed Explorer",
-      "vibeDescription": "",
+      "name": "Creative Relaxed Name for ${trip.city}",
+      "vibeDescription": "Vibe description...",
       "estimatedTotalCost": 0,
       "budgetFit": "within",
-      "highlights": ["", "", ""],
-      "bestFor": ""
+      "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"],
+      "bestFor": "Best for..."
     },
     {
       "id": "balanced-highlights",
-      "name": "Balanced Highlights",
-      "vibeDescription": "",
+      "name": "Creative Balanced Name for ${trip.city}",
+      "vibeDescription": "Vibe description...",
       "estimatedTotalCost": 0,
       "budgetFit": "within",
-      "highlights": ["", "", ""],
-      "bestFor": ""
+      "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"],
+      "bestFor": "Best for..."
     },
     {
       "id": "packed-adventurer",
-      "name": "Packed Adventurer",
-      "vibeDescription": "",
+      "name": "Creative Action Name for ${trip.city}",
+      "vibeDescription": "Vibe description...",
       "estimatedTotalCost": 0,
       "budgetFit": "within",
-      "highlights": ["", "", ""],
-      "bestFor": ""
+      "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"],
+      "bestFor": "Best for..."
     }
   ]
 }`;

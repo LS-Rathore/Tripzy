@@ -102,7 +102,8 @@ INSTRUCTIONS:
 6. Give a per-day cost total (based on the first/default option in each slot) and a full-trip total.
 7. Flag if the stated budget is unrealistic for this city/style/concept.
 8. State best time of year to visit and 2-3 things to avoid.
-9. Tone: warm, direct, like a local friend — not a listicle.
+9. CRITICAL FOR FOOD STOPS: Every single day MUST feature unique, distinct food stops and meal options for breakfast, lunch, and dinner. Food options MUST change daily and align with the specific neighborhoods/attractions visited on that day (e.g., street food near bazaars, heritage dining near forts, relaxing cafes near gardens). DO NOT repeat the same food titles, restaurant names, or dish descriptions across different days.
+10. Tone: warm, direct, like a local friend — not a listicle.
 
 OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no commentary, no code fences, matching this schema:
 {
@@ -351,54 +352,54 @@ function getMockItinerary(details: TripItineraryDetails): ItineraryResponse {
             breakfast: {
               options: [
                 {
-                  title: `Local Traditional Breakfast`,
-                  location: `Heritage Corner Cafe`,
+                  title: i % 3 === 1 ? `Pyaz Kachori & Special Kulhad Chai` : i % 3 === 2 ? `Artisan Bakery & Fresh Filter Coffee` : `Classic South Indian Tiffin & Masala Dosa`,
+                  location: i % 3 === 1 ? `Old Town Heritage Quarter` : i % 3 === 2 ? `Arts & Cultural District` : `Market Square`,
                   cost: breakfastCost,
-                  tag: 'Highly Rated',
-                  reason: 'Try the fresh local specialty served with warm tea.'
+                  tag: i % 2 === 1 ? 'Highly Rated' : 'Popular',
+                  reason: i % 3 === 1 ? 'Iconic local breakfast spot packed with authentic morning flavors.' : i % 3 === 2 ? 'Relaxed atmosphere with fresh pastries and roasted brews.' : 'Crisp dosa and piping hot sambar served fresh from the griddle.'
                 },
                 {
-                  title: `Quick Continental Breakfast`,
-                  location: `Hotel Buffet`,
+                  title: i % 2 === 0 ? `Healthy Organic Smoothie Bowl` : `Quick Continental Hotel Buffet`,
+                  location: `Central Avenue Cafe`,
                   cost: breakfastCost,
                   tag: 'Budget-Friendly',
-                  reason: 'Fast, healthy, and convenient option to start the day.'
+                  reason: 'Light and quick breakfast option to keep you energized for morning walks.'
                 }
               ]
             },
             lunch: {
               options: [
                 {
-                  title: `Signature Regional Thali`,
-                  location: `Local Favorite Restaurant`,
+                  title: i % 3 === 1 ? `Authentic Regional Thali Feast` : i % 3 === 2 ? `Historic Courtyard Garden Dining` : `Local Street Market Snack Crawl`,
+                  location: i % 3 === 1 ? `Heritage Fine Dining` : i % 3 === 2 ? `Palace Precincts` : `Main Bazaar Food Walk`,
                   cost: lunchCost,
-                  tag: 'Popular',
-                  reason: 'A massive sample of all the regional gravies, breads, and sweets.'
+                  tag: i % 3 === 1 ? 'Popular' : i % 3 === 2 ? 'Highly Rated' : 'Hidden Gem',
+                  reason: i % 3 === 1 ? 'A grand feast showcasing a wide array of authentic local curries & breads.' : i % 3 === 2 ? 'Dine in a tranquil heritage courtyard with traditional music.' : 'Sample famous local street snacks across 4 renowned food stalls.'
                 },
                 {
-                  title: `Organic farm-to-table lunch`,
-                  location: `Eco Cafe`,
+                  title: i % 2 === 0 ? `Farm-to-Table Eco Bistro` : `Classic Woodfired Pizza & Pasta`,
+                  location: `Greenwood Park Quarter`,
                   cost: Math.round(lunchCost * 1.1),
                   tag: 'Highly Rated',
-                  reason: 'Fresh, healthy food using locally sourced ingredients.'
+                  reason: 'Fresh, organic ingredients crafted into comforting fusion meals.'
                 }
               ]
             },
             dinner: {
               options: [
                 {
-                  title: `Royal Dinner with City Views`,
-                  location: `Rooftop Terrace Grill`,
+                  title: i % 3 === 1 ? `Royal Rooftop Dinner with Sunset Views` : i % 3 === 2 ? `Lakeside Grill & Candlelight Dining` : `Famous Night Bazaar Kebab & Biryani Trail`,
+                  location: i % 3 === 1 ? `Fort View Rooftop Terrace` : i % 3 === 2 ? `Waterfront Promenade` : `Old City Night Market`,
                   cost: dinnerCost,
-                  tag: 'Highly Rated',
-                  reason: 'Elegant, delicious dinner overlooking the illuminated city monuments.'
+                  tag: i % 3 === 1 ? 'Highly Rated' : i % 3 === 2 ? 'Popular' : 'Hidden Gem',
+                  reason: i % 3 === 1 ? 'Panoramic views of city lights paired with rich local delicacies.' : i % 3 === 2 ? 'Charming open-air seating right along the serene waterside.' : 'Unmatched aromatic spices and slow-cooked local recipes.'
                 },
                 {
-                  title: `Famous Local Street Food Crawl`,
-                  location: `Night Food Street`,
-                  cost: Math.round(dinnerCost * 0.5),
+                  title: i % 2 === 0 ? `Live Folk Performance & Buffet` : `Cozy Craft Cafe & Dessert Parlor`,
+                  location: `Cultural Village`,
+                  cost: Math.round(dinnerCost * 0.9),
                   tag: 'Budget-Friendly',
-                  reason: 'Explore multiple stalls to try the best spicy snacks in the city.'
+                  reason: 'Enjoy local dance performances alongside a lavish evening dinner.'
                 }
               ]
             }

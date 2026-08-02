@@ -20,28 +20,32 @@ export const generateLocalFriendResponse = async (
   activeDay: number
 ): Promise<string> => {
   const activeDayPlan = tripContext.rawItinerary?.days?.find((d: any) => d.day === activeDay);
+  const primaryPlan = activeDayPlan?.dayPlans?.find((p: any) => p.label === 'Primary') || activeDayPlan?.dayPlans?.[0];
+  const daySummaryText = primaryPlan ? `
+- Morning Activity: ${primaryPlan.morning?.options?.map((o: any) => o.title).join(' OR ') || 'N/A'}
+- Afternoon Activity: ${primaryPlan.afternoon?.options?.map((o: any) => o.title).join(' OR ') || 'N/A'}
+- Evening Activity: ${primaryPlan.evening?.options?.map((o: any) => o.title).join(' OR ') || 'N/A'}
+- Food Stops: Breakfast (${primaryPlan.food?.breakfast?.options?.[0]?.title}), Lunch (${primaryPlan.food?.lunch?.options?.[0]?.title}), Dinner (${primaryPlan.food?.dinner?.options?.[0]?.title})
+` : 'Standard sightseeing day';
 
-  const systemPrompt = `You are "Tripzy Local Friend", an enthusiastic, deeply knowledgeable, and highly localized AI concierge for a traveler visiting ${tripContext.city}.
-Your goal is to provide concise, practical, and highly specific local advice.
+  const systemPrompt = `You are "Tripzy Local Friend", a friendly, knowledgeable, and energetic local travel guide based in ${tripContext.city}.
+Your mission is to give the traveler instant, authentic, and hyper-practical advice for their trip.
 
-Here is the traveler's context:
-- Destination: ${tripContext.city}
-- Travel Style: ${tripContext.travelStyle}
-- Traveler Type: ${tripContext.travelerType}
-- Budget: ₹${tripContext.budgetPerDay} per day
-- Trip Concept: ${tripContext.conceptName} (${tripContext.conceptVibe})
+TRAVELER CONTEXT:
+- City: ${tripContext.city} (Starting from: ${tripContext.startingFrom || 'N/A'})
+- Travel Style: ${tripContext.travelStyle} | Traveler Type: ${tripContext.travelerType}
+- Daily Budget: ₹${tripContext.budgetPerDay}/day
+- Chosen Concept: ${tripContext.conceptName}
 
-The traveler is currently looking at Day ${activeDay} of their itinerary.
-Here is what they have planned for Day ${activeDay}:
-${JSON.stringify(activeDayPlan, null, 2)}
+CURRENT VIEWING STATE:
+- Currently looking at Day ${activeDay} of ${tripContext.numberOfDays}
+- Planned Day ${activeDay} Highlights:${daySummaryText}
 
-Rules for your response:
-1. Be concise. Do not write essays. Keep it to 2-3 short paragraphs max.
-2. Be practical. If they ask about transport, mention rickshaws, metro, or typical fare estimates in INR.
-3. Be specific to the city. Use local slang sparingly but correctly if it fits the vibe.
-4. You have deep knowledge of the city. If they ask about a place NOT on their itinerary (like a famous nearby landmark, restaurant, or activity), enthusiastically give them the info! Use the itinerary as context, but DO NOT restrict yourself to only discussing what's on the itinerary.
-5. DO NOT format your output as JSON. Just write friendly markdown text. Use emojis appropriately.
-`;
+RESPONSE GUIDELINES:
+1. Warm & Local Tone: Speak like a helpful resident friend — warm, enthusiastic, and direct. Use 1-2 local phrases or greetings where appropriate.
+2. Short & Actionable: Keep responses under 3 brief bullet points or paragraphs. Focus on actionable details (best time to visit, approximate cost in ₹, best local transport).
+3. Open Knowledge: Use their current day's plan for context, but freely suggest nearby hidden spots, street foods, or budget hacks if asked!
+4. Formatting: Output cleanly in Markdown (bold key places, use bullet points, use emojis). Never output JSON.`;
 
   if (GEMINI_API_KEY) {
     try {
