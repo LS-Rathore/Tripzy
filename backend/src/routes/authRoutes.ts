@@ -84,21 +84,35 @@ router.get('/google/callback', async (req: Request, res: Response) => {
       return;
     }
 
-    // Find or create user in DB
-    const user = await prisma.user.upsert({
-      where: { googleId: payload.sub },
-      update: {
-        name: payload.name || 'Traveler',
-        email: payload.email,
-        avatar: payload.picture || null,
-      },
-      create: {
-        googleId: payload.sub,
-        name: payload.name || 'Traveler',
-        email: payload.email,
-        avatar: payload.picture || null,
+    // Find or create user in DB (safe against unique email/googleId conflicts)
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { googleId: payload.sub },
+          { email: payload.email },
+        ],
       },
     });
+
+    if (user) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          googleId: payload.sub,
+          name: payload.name || user.name || 'Traveler',
+          avatar: payload.picture || user.avatar || null,
+        },
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          googleId: payload.sub,
+          name: payload.name || 'Traveler',
+          email: payload.email,
+          avatar: payload.picture || null,
+        },
+      });
+    }
 
     // Create JWT
     const jwtPayload = {
