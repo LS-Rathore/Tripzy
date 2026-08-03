@@ -31,6 +31,17 @@ function getOAuthClient(req?: Request) {
   };
 }
 
+// Diagnostic endpoint to check database connectivity
+router.get('/test-db', async (_req: Request, res: Response) => {
+  try {
+    const userCount = await prisma.user.count();
+    res.json({ success: true, userCount, database: 'Connected!' });
+  } catch (err: any) {
+    console.error('Database connection test failed:', err);
+    res.status(500).json({ success: false, error: err?.message || String(err) });
+  }
+});
+
 // Step 1: Redirect user to Google's OAuth consent screen
 router.get('/google', (req: Request, res: Response) => {
   const { client, redirectUri } = getOAuthClient(req);
