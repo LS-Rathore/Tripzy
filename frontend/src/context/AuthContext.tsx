@@ -25,15 +25,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Check session on mount
   useEffect(() => {
     const checkSession = async () => {
+      // Check if URL has ?token= from OAuth redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token');
+      if (urlToken) {
+        localStorage.setItem('tripzy_token', urlToken);
+        // Clean URL query cleanly without reloading page
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      const storedToken = localStorage.getItem('tripzy_token');
+      const headers: Record<string, string> = {};
+      if (storedToken) {
+        headers['Authorization'] = `Bearer ${storedToken}`;
+      }
+
       try {
         const res = await fetch(`${API_URL}/auth/me`, {
           credentials: 'include',
+          headers,
         });
 
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
         } else {
+          localStorage.removeItem('tripzy_token');
           setUser(null);
         }
       } catch {
@@ -53,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Clear session
   const logout = async () => {
+    localStorage.removeItem('tripzy_token');
     try {
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',

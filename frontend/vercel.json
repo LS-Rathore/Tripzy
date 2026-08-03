@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/auth/(.*)",
+      "destination": "https://tripzy-backend-3ftn.onrender.com/auth/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://tripzy-backend-3ftn.onrender.com/api/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

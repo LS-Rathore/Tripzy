@@ -121,8 +121,8 @@ router.get('/google/callback', async (req: Request, res: Response) => {
       path: '/',
     });
 
-    // Redirect to frontend
-    res.redirect(`${FRONTEND_URL}/plan`);
+    // Redirect to frontend with token parameter for fail-safe auth fallback
+    res.redirect(`${FRONTEND_URL}/plan?token=${token}`);
   } catch (error: any) {
     console.error('Google OAuth error:', error?.message || error);
     const reason = encodeURIComponent(error?.message || 'oauth_failed');

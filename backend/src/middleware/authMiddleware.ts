@@ -13,7 +13,9 @@ export interface AuthRequest extends Request {
 }
 
 export function requireAuth(req: AuthRequest, res: Response, next: NextFunction): void {
-  const token = req.cookies?.tripzy_token;
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+  const token = req.cookies?.tripzy_token || bearerToken;
 
   if (!token) {
     res.status(401).json({ error: 'Not authenticated' });
