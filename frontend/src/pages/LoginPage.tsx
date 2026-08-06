@@ -1,8 +1,59 @@
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { login, loginWithEmail, signupWithEmail } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email.trim() || !password) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (mode === 'signup' && !name.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (mode === 'signin') {
+        await loginWithEmail(email, password);
+      } else {
+        await signupWithEmail(name, email, password);
+      }
+      navigate('/plan');
+    } catch (err: any) {
+      setError(err?.message || 'Authentication failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleMode = () => {
+    setError(null);
+    setMode((prev) => (prev === 'signin' ? 'signup' : 'signin'));
+  };
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md flex flex-col">
@@ -15,19 +66,130 @@ export default function LoginPage() {
             <span className="material-symbols-outlined text-3xl font-bold">flight_takeoff</span>
           </div>
 
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h1 className="text-2xl font-black text-on-surface mb-2 font-display-lg">
-              Welcome to Tripzy!
+              {mode === 'signin' ? 'Welcome to Tripzy!' : 'Join Tripzy!'}
             </h1>
-            <p className="font-body-md text-on-surface-variant font-medium">
-              Sign in to plan, save, and manage your trips.
+            <p className="font-body-md text-on-surface-variant text-sm font-medium">
+              {mode === 'signin'
+                ? 'Sign in to plan, save, and manage your trips.'
+                : 'Create an account to start generating AI travel itineraries.'}
             </p>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border-2 border-red-400 rounded-xl text-red-700 text-xs font-bold flex items-center gap-2">
+              <span className="material-symbols-outlined text-base shrink-0">error</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Name Input (Sign Up mode only) */}
+            {mode === 'signup' && (
+              <div className="space-y-1.5 text-left">
+                <label className="font-label-sm text-xs font-bold text-on-surface-variant ml-1 block" htmlFor="page-name">
+                  Full Name
+                </label>
+                <input
+                  className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none text-sm"
+                  id="page-name"
+                  placeholder="Alex Explorer"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required={mode === 'signup'}
+                />
+              </div>
+            )}
+
+            {/* Email Input */}
+            <div className="space-y-1.5 text-left">
+              <label className="font-label-sm text-xs font-bold text-on-surface-variant ml-1 block" htmlFor="page-email">
+                Email Address
+              </label>
+              <input
+                className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none text-sm"
+                id="page-email"
+                placeholder="explorer@tripzy.ai"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-1.5 text-left">
+              <label className="font-label-sm text-xs font-bold text-on-surface-variant ml-1 block" htmlFor="page-password">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none pr-12 text-sm"
+                  id="page-password"
+                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-tripzy-orange p-1"
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3.5 px-6 bg-tripzy-orange text-white font-black text-base rounded-xl border-[3px] border-[#251913] shadow-[4px_4px_0px_0px_#251913] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#251913] active:translate-y-[4px] active:shadow-none transition-all duration-100 mt-2 font-display-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                  <span>{mode === 'signin' ? 'Signing In...' : 'Creating Account...'}</span>
+                </>
+              ) : (
+                <span>{mode === 'signin' ? 'Sign In' : 'Create Account'}</span>
+              )}
+            </button>
+          </form>
+
+          {/* Toggle Mode Link */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="text-xs font-bold text-on-surface-variant hover:text-tripzy-orange transition-colors"
+            >
+              {mode === 'signin' ? (
+                <>Don't have an account? <span className="underline text-tripzy-orange">Sign Up</span></>
+              ) : (
+                <>Already have an account? <span className="underline text-tripzy-orange">Sign In</span></>
+              )}
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-[2px] flex-1 bg-outline-variant/40 rounded-full"></div>
+            <span className="font-label-sm text-[12px] text-on-surface-variant font-bold uppercase tracking-widest">or</span>
+            <div className="h-[2px] flex-1 bg-outline-variant/40 rounded-full"></div>
           </div>
 
           {/* Google Sign In Button */}
           <button
             onClick={login}
-            className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-[3px] border-[#251913] rounded-xl shadow-[4px_4px_0px_0px_#251913] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#251913] active:translate-y-[4px] active:shadow-none transition-all duration-100 group"
+            type="button"
+            className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white border-[3px] border-[#251913] rounded-xl shadow-[4px_4px_0px_0px_#251913] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#251913] active:translate-y-[4px] active:shadow-none transition-all duration-100 group"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -53,7 +215,7 @@ export default function LoginPage() {
           </button>
 
           {/* Legal Footer */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <p className="font-label-sm text-[12px] leading-relaxed text-on-surface-variant px-4">
               By continuing, you agree to Tripzy's <br className="hidden sm:block" />
               <a className="underline font-bold hover:text-tripzy-orange transition-colors" href="#">

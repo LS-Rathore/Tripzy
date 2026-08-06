@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TripFormData } from '../../types/TripForm';
 import type { TripConcept } from '../../types/Trip';
+import { API_URL, authFetch } from '../../utils/api';
 
 const INTEREST_OPTIONS = [
   "Foodie",
@@ -44,8 +45,6 @@ export default function PlanTripForm({ onTopHalfComplete, onConceptsLoaded }: Pl
     travelerType: 'Solo',
     startingFrom: ''
   });
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -98,7 +97,7 @@ export default function PlanTripForm({ onTopHalfComplete, onConceptsLoaded }: Pl
     setErrors({});
     
     try {
-      const res = await fetch(`${API_URL}/api/trips/concepts`, {
+      const res = await authFetch(`${API_URL}/api/trips/concepts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { API_URL, authFetch } from '../../utils/api';
 
 interface Message {
   role: 'user' | 'model';
@@ -17,8 +18,6 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -41,10 +40,9 @@ export default function LocalFriendChat({ tripId, activeDay }: LocalFriendChatPr
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/trips/${tripId}/chat`, {
+      const res = await authFetch(`${API_URL}/api/trips/${tripId}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           message: text,
           history: messages,

@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { prisma } from '../config/db.js';
 import { requireAuth, type AuthRequest } from '../middleware/authMiddleware.js';
 
@@ -147,6 +148,127 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 // Get current authenticated user
 router.get('/me', requireAuth, (req: AuthRequest, res: Response) => {
   res.json({ user: req.user });
+});
+
+// Email & Password Sign Up
+router.post('/signup', async (req: Request, res: Response) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      res.status(400).json({ error: 'Name, email, and password are required' });
+      return;
+    }
+
+    if (password.length < 6) {
+      res.status(400).json({ error: 'Password must be at least 6 characters long' });
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existingUser) {
+      res.status(400).json({ error: 'An account with this email already exists' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: normalizedEmail,
+        password: hashedPassword,
+      },
+    });
+
+    const jwtPayload = {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      avatar: newUser.avatar,
+    };
+
+    const token = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' });
+    const isCrossSite = process.env.NODE_ENV === 'production' || Boolean(process.env.BACKEND_URL?.startsWith('https'));
+
+    res.cookie('tripzy_token', token, {
+      httpOnly: true,
+      secure: isCrossSite,
+      sameSite: isCrossSite ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    res.status(201).json({
+      message: 'Account created successfully',
+      token,
+      user: jwtPayload,
+    });
+  } catch (error: any) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Failed to create account. Please try again.' });
+  }
+});
+
+// Email & Password Login
+router.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ error: 'Email and password are required' });
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user || !user.password) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const jwtPayload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+    };
+
+    const token = jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: '7d' });
+    const isCrossSite = process.env.NODE_ENV === 'production' || Boolean(process.env.BACKEND_URL?.startsWith('https'));
+
+    res.cookie('tripzy_token', token, {
+      httpOnly: true,
+      secure: isCrossSite,
+      sameSite: isCrossSite ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    res.json({
+      message: 'Logged in successfully',
+      token,
+      user: jwtPayload,
+    });
+  } catch (error: any) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Failed to log in. Please try again.' });
+  }
 });
 
 // Logout — clear the cookie

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { API_URL, authFetch } from '../utils/api';
 
 interface User {
   id: string;
@@ -11,12 +12,12 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: () => void;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  signupWithEmail: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -35,16 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const storedToken = localStorage.getItem('tripzy_token');
-      const headers: Record<string, string> = {};
-      if (storedToken) {
-        headers['Authorization'] = `Bearer ${storedToken}`;
+      if (!storedToken) {
+        setUser(null);
+        setLoading(false);
+        return;
       }
 
       try {
-        const res = await fetch(`${API_URL}/auth/me`, {
-          credentials: 'include',
-          headers,
-        });
+        const res = await authFetch(`${API_URL}/auth/me`);
 
         if (res.ok) {
           const data = await res.json();
@@ -68,22 +67,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = `${API_URL}/auth/google`;
   };
 
+  const loginWithEmail = async (email: string, password: string) => {
+    const res = await authFetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to log in');
+    }
+
+    if (data.token) {
+      localStorage.setItem('tripzy_token', data.token);
+    }
+    setUser(data.user);
+  };
+
+  const signupWithEmail = async (name: string, email: string, password: string) => {
+    const res = await authFetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to sign up');
+    }
+
+    if (data.token) {
+      localStorage.setItem('tripzy_token', data.token);
+    }
+    setUser(data.user);
+  };
+
   // Clear session
   const logout = async () => {
-    localStorage.removeItem('tripzy_token');
     try {
-      await fetch(`${API_URL}/auth/logout`, {
+      await authFetch(`${API_URL}/auth/logout`, {
         method: 'POST',
-        credentials: 'include',
       });
     } catch {
       // Even if the request fails, clear local state
+    } finally {
+      localStorage.removeItem('tripzy_token');
+      setUser(null);
     }
-    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithEmail, signupWithEmail, logout }}>
       {children}
     </AuthContext.Provider>
   );

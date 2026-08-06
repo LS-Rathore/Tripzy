@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Trip, Expense } from '../../types/Trip';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL, authFetch } from '../../utils/api';
 
 interface TripExpensesProps {
   trip: Trip;
@@ -28,9 +27,7 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
 
   const fetchExpenses = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/trips/${trip.id}/expenses`, {
-        credentials: 'include'
-      });
+      const res = await authFetch(`${API_URL}/api/trips/${trip.id}/expenses`);
       if (res.ok) {
         const data = await res.json();
         setExpenses(data);
@@ -47,9 +44,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
     setNewMemberName('');
 
     try {
-      await fetch(`${API_URL}/api/trips/${trip.id}/members`, {
+      await authFetch(`${API_URL}/api/trips/${trip.id}/members`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -65,9 +61,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
     setMembers(updatedMembers);
 
     try {
-      await fetch(`${API_URL}/api/trips/${trip.id}/members`, {
+      await authFetch(`${API_URL}/api/trips/${trip.id}/members`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -85,9 +80,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
     
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/trips/${trip.id}/expenses`, {
+      const res = await authFetch(`${API_URL}/api/trips/${trip.id}/expenses`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -122,9 +116,8 @@ export default function TripExpenses({ trip }: TripExpensesProps) {
 
   const deleteExpense = async (id: string) => {
     try {
-      await fetch(`${API_URL}/api/trips/${trip.id}/expenses/${id}`, {
+      await authFetch(`${API_URL}/api/trips/${trip.id}/expenses/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
       });
       setExpenses(expenses.filter(e => e.id !== id));
     } catch (err) {

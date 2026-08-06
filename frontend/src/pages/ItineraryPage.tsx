@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import LocalFriendChat from '../components/trip/LocalFriendChat';
 import TripExpenses from '../components/trip/TripExpenses';
+import { API_URL, authFetch } from '../utils/api';
 
 import type { Trip, PrimaryDayPlan, AlternativeDayPlan, ItineraryOption } from '../types/Trip';
 
@@ -18,15 +19,11 @@ export default function ItineraryPage() {
   const [activeTab, setActiveTab] = useState<'itinerary' | 'expenses'>('itinerary');
   const [selections, setSelections] = useState<Record<string, number>>({});
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
   useEffect(() => {
     const fetchTrip = async () => {
       if (!tripId) return;
       try {
-        const res = await fetch(`${API_URL}/api/trips/${tripId}`, {
-          credentials: 'include', // essential to pass auth cookies
-        });
+        const res = await authFetch(`${API_URL}/api/trips/${tripId}`);
 
         if (!res.ok) {
           throw new Error('Could not find your trip details.');

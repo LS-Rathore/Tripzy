@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, authFetch } from '../utils/api';
 
 interface TripSummary {
   id: string;
@@ -18,15 +19,12 @@ export default function MyTripsPage() {
   const [error, setError] = useState<string | null>(null);
   const [tripToDelete, setTripToDelete] = useState<string | null>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
   const confirmDelete = async () => {
     if (!tripToDelete) return;
     
     try {
-      const res = await fetch(`${API_URL}/api/trips/${tripToDelete}`, {
+      const res = await authFetch(`${API_URL}/api/trips/${tripToDelete}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
       
       if (!res.ok) {
@@ -48,9 +46,7 @@ export default function MyTripsPage() {
 
     const fetchTrips = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/trips`, {
-          credentials: 'include',
-        });
+        const res = await authFetch(`${API_URL}/api/trips`);
         if (!res.ok) {
           throw new Error('Failed to fetch trips');
         }
@@ -64,7 +60,7 @@ export default function MyTripsPage() {
     };
 
     fetchTrips();
-  }, [user, API_URL]);
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-tripzy-bg text-on-surface font-body-md flex flex-col relative overflow-hidden">

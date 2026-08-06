@@ -5,6 +5,7 @@ import PlanTripForm from '../components/plan/PlanTripForm';
 import ConceptsSelection from '../components/plan/ConceptsSelection';
 import type { TripConcept } from '../types/Trip';
 import type { TripFormData } from '../types/TripForm';
+import { API_URL, authFetch } from '../utils/api';
 
 export default function PlanTripPage() {
   const navigate = useNavigate();
@@ -13,8 +14,6 @@ export default function PlanTripPage() {
   const [formData, setFormData] = useState<TripFormData | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleConceptsLoaded = (loadedConcepts: TripConcept[], data: TripFormData) => {
     setConcepts(loadedConcepts);
@@ -28,7 +27,7 @@ export default function PlanTripPage() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/trips`, {
+      const res = await authFetch(`${API_URL}/api/trips`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

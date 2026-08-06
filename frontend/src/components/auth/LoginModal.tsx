@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 interface LoginModalProps {
@@ -7,8 +7,15 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { login, loginWithEmail, signupWithEmail } = useAuth();
 
   // Close on Escape key
   useEffect(() => {
@@ -30,6 +37,46 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email.trim() || !password) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (mode === 'signup' && !name.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (mode === 'signin') {
+        await loginWithEmail(email, password);
+      } else {
+        await signupWithEmail(name, email, password);
+      }
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || 'Authentication failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleMode = () => {
+    setError(null);
+    setMode((prev) => (prev === 'signin' ? 'signup' : 'signin'));
+  };
 
   if (!isOpen) return null;
 
@@ -58,44 +105,78 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
         <div className="text-center mb-6 pt-2">
           <h3 className="text-xl font-black text-on-surface mb-1 font-display-lg">
-            Sign In
+            {mode === 'signin' ? 'Sign In' : 'Create Account'}
           </h3>
           <p className="font-body-md text-xs text-on-surface-variant font-semibold">
-            Plan, save, and manage your trips.
+            {mode === 'signin' ? 'Plan, save, and manage your trips.' : 'Join Tripzy to start planning your dream trips.'}
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border-2 border-red-400 rounded-xl text-red-700 text-xs font-bold flex items-center gap-2">
+            <span className="material-symbols-outlined text-base shrink-0">error</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Name Input (Sign Up mode only) */}
+          {mode === 'signup' && (
+            <div className="space-y-1.5 text-left">
+              <label className="font-label-sm text-xs font-bold text-on-surface-variant ml-1 block" htmlFor="modal-name">
+                Full Name
+              </label>
+              <input 
+                className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none text-sm" 
+                id="modal-name" 
+                placeholder="Alex Explorer" 
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required={mode === 'signup'}
+              />
+            </div>
+          )}
+
           {/* Email Input */}
-          <div className="space-y-2 text-left">
-            <label className="font-label-sm text-sm font-bold text-on-surface-variant ml-1 block" htmlFor="email">Email Address</label>
+          <div className="space-y-1.5 text-left">
+            <label className="font-label-sm text-xs font-bold text-on-surface-variant ml-1 block" htmlFor="modal-email">
+              Email Address
+            </label>
             <input 
-              className="w-full px-4 py-4 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[4px_4px_0px_0px_#251913] transition-all outline-none" 
-              id="email" 
+              className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none text-sm" 
+              id="modal-email" 
               placeholder="explorer@tripzy.ai" 
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
           {/* Password Input */}
-          <div className="space-y-2 text-left">
+          <div className="space-y-1.5 text-left">
             <div className="flex justify-between items-center px-1">
-              <label className="font-label-sm text-sm font-bold text-on-surface-variant" htmlFor="password">Password</label>
-              <a className="text-[12px] font-label-sm text-tripzy-orange font-bold hover:underline" href="#">Forgot?</a>
+              <label className="font-label-sm text-xs font-bold text-on-surface-variant" htmlFor="modal-password">
+                Password
+              </label>
             </div>
             <div className="relative">
               <input 
-                className="w-full px-4 py-4 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[4px_4px_0px_0px_#251913] transition-all outline-none pr-12" 
-                id="password" 
+                className="w-full px-4 py-3 rounded-xl bg-white font-body-md font-medium text-on-surface border-[3px] border-[#251913] focus:ring-0 focus:border-tripzy-orange focus:shadow-[3px_3px_0px_0px_#251913] transition-all outline-none pr-12 text-sm" 
+                id="modal-password" 
                 placeholder="••••••••" 
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <button 
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-tripzy-orange p-1" 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-tripzy-orange p-1" 
                 onClick={() => setShowPassword(!showPassword)}
                 type="button"
               >
-                <span className="material-symbols-outlined">
+                <span className="material-symbols-outlined text-lg">
                   {showPassword ? "visibility_off" : "visibility"}
                 </span>
               </button>
@@ -103,13 +184,39 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </div>
 
           {/* Main Action Button */}
-          <button className="w-full py-4 px-6 bg-tripzy-orange text-white font-black text-lg rounded-xl border-[3px] border-[#251913] shadow-[4px_4px_0px_0px_#251913] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#251913] active:translate-y-[4px] active:shadow-none transition-all duration-100 mt-2 font-display-lg tracking-wide">
-            Sign In
+          <button 
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3.5 px-6 bg-tripzy-orange text-white font-black text-base rounded-xl border-[3px] border-[#251913] shadow-[4px_4px_0px_0px_#251913] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#251913] active:translate-y-[4px] active:shadow-none transition-all duration-100 mt-2 font-display-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                <span>{mode === 'signin' ? 'Signing In...' : 'Creating Account...'}</span>
+              </>
+            ) : (
+              <span>{mode === 'signin' ? 'Sign In' : 'Create Account'}</span>
+            )}
           </button>
         </form>
 
+        {/* Toggle Mode Link */}
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="text-xs font-bold text-on-surface-variant hover:text-tripzy-orange transition-colors"
+          >
+            {mode === 'signin' ? (
+              <>Don't have an account? <span className="underline text-tripzy-orange">Sign Up</span></>
+            ) : (
+              <>Already have an account? <span className="underline text-tripzy-orange">Sign In</span></>
+            )}
+          </button>
+        </div>
+
         {/* Divider */}
-        <div className="flex items-center gap-4 my-8">
+        <div className="flex items-center gap-4 my-6">
           <div className="h-[2px] flex-1 bg-outline-variant/40 rounded-full"></div>
           <span className="font-label-sm text-[12px] text-on-surface-variant font-bold uppercase tracking-widest">or</span>
           <div className="h-[2px] flex-1 bg-outline-variant/40 rounded-full"></div>
@@ -118,7 +225,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         {/* Social Action */}
         <button 
           onClick={login}
-          className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-[3px] border-outline-variant/60 rounded-xl hover:bg-tripzy-bg hover:border-[#251913] active:scale-[0.98] transition-all duration-200 group"
+          type="button"
+          className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-white border-[3px] border-outline-variant/60 rounded-xl hover:bg-tripzy-bg hover:border-[#251913] active:scale-[0.98] transition-all duration-200 group"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
             <path
@@ -142,8 +250,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </button>
 
         {/* Legal Footer */}
-        <div className="mt-8 text-center">
-          <p className="font-label-sm text-[12px] leading-relaxed text-on-surface-variant px-4">
+        <div className="mt-6 text-center">
+          <p className="font-label-sm text-[11px] leading-relaxed text-on-surface-variant px-2">
             By continuing, you agree to Tripzy's <br className="hidden sm:block"/>
             <a className="underline font-bold hover:text-tripzy-orange transition-colors" href="#">Terms of Service</a> 
             {" "}and{" "}
