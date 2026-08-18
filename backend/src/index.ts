@@ -30,6 +30,11 @@ app.use('/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/trips', expenseRoutes);
 
+// Health check endpoint for keep-alive pinger
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.get('/', (req, res) => {
   res.send('Tripzy API is running!');
 });
