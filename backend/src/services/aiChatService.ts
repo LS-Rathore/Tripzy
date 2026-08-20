@@ -50,7 +50,7 @@ RESPONSE GUIDELINES:
   if (GEMINI_API_KEY) {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.6-flash',
         systemInstruction: systemPrompt
       });
 
@@ -75,7 +75,7 @@ RESPONSE GUIDELINES:
 
       const chatCompletion = await groq.chat.completions.create({
         messages: groqMessages as any,
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         temperature: 0.7,
         max_tokens: 1024,
       });

@@ -122,7 +122,7 @@ export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsR
   if (GEMINI_API_KEY && GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE') {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.6-flash',
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2048,
@@ -151,7 +151,7 @@ export async function generateTripConcepts(trip: TripDetails): Promise<ConceptsR
     try {
       const chatCompletion = await groq.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         temperature: 0.7,
         max_tokens: 2048,
         response_format: { type: 'json_object' }
