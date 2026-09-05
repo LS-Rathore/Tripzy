@@ -2,29 +2,39 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Runs every 3 days at 00:00 UTC
-    - cron: '0 0 */3 * *'
+    # Runs every 2 days at 04:00 UTC (well within Supabase 7-day inactivity limit)
+    - cron: '0 4 */2 * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase API
+      - name: Ping Supabase Database & Auth
         run: |
           # Clean URL by removing trailing slashes or /rest/v1 if included in secret
           BASE_URL=$(echo "${{ secrets.SUPABASE_URL }}" | sed 's/\/*$//' | sed 's/\/rest\/v1$//')
           
-          echo "Pinging Supabase at: $BASE_URL/auth/v1/health"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          echo "1. Querying PostgreSQL table via PostgREST to register real DB activity..."
+          DB_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "$BASE_URL/rest/v1/Trip?select=id&limit=1")
+            
+          DB_STATUS=$(echo "$DB_RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
+          echo "Database Query HTTP Status: $DB_STATUS"
+
+          echo "2. Pinging Auth service..."
+          AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             "$BASE_URL/auth/v1/health")
-            
-          echo "Supabase Health Response Code: $STATUS"
+          echo "Auth Health HTTP Status: $AUTH_STATUS"
 
-          if [ "$STATUS" -ne 200 ]; then
-            echo "Secondary Ping to REST API..."
-            REST_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rest/v1/?apikey=${{ secrets.SUPABASE_ANON_KEY }}")
-            echo "Supabase REST API Response Code: $REST_STATUS"
+          # If project is paused, curl will typically return 503 or fail to connect
+          if [ "$DB_STATUS" -eq 503 ] || [ "$AUTH_STATUS" -eq 503 ]; then
+            echo "❌ Supabase project appears to be paused! Please unpause it from the Supabase dashboard."
+            exit 1
           fi
+
+          echo "✅ Supabase pinged successfully. Database activity registered."
